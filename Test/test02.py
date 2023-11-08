@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score
 
 # 读取CSV文件
 df = pd.read_csv('dataset.csv')
@@ -18,6 +18,8 @@ tfidf = TfidfVectorizer(max_features=5000)
 X = tfidf.fit_transform(df['text'])
 y = df['category']  # 注意这里的列名改为'category'
 
+print(tfidf.get_feature_names_out())
+
 # 分割数据集
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -27,4 +29,5 @@ model.fit(X_train, y_train)
 
 # 预测与评估
 y_pred = model.predict(X_test)
+print(accuracy_score(y_test, y_pred))
 print(classification_report(y_test, y_pred))
