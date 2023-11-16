@@ -1,35 +1,45 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
-import time
+import time, json
 
-# 设置Chrome选项（如果需要）
+# please run this .py in dataCrawler directory
 chrome_options = Options()
-# 例如，要在无头模式下运行Chrome，取消注释以下行
-# chrome_options.add_argument("--headless")
-
-# 使用WebDriver Manager自动管理驱动程序版本
+chrome_options.add_experimental_option('detach', True)
 service = Service(ChromeDriverManager().install())
-
-# 创建WebDriver实例
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
-# 打开Google首页
-driver.get("http://www.google.com")
+typeOfNews = ['health', 'business', 'politics', 'culture-matters']
+result = []
 
-time.sleep(5)
+for type in typeOfNews:
+    driver.get(f'https://www.nbcnews.com/{type}')
+    time.sleep(2)
+    for times in range(0, 100):
+        driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
+        mainBox = driver.find_element(By.CLASS_NAME, 'styles_itemsContainer__saJYW')
+        newsBoxs = mainBox.find_elements(By.CLASS_NAME, 'wide-tease-item__wrapper')
+        print(f'\r{len(newsBoxs)} {type} news items found', end='')
+        try:
+            driver.find_element(By.CLASS_NAME, 'styles_loadMoreWrapper__pOldr').find_element(By.TAG_NAME, 'button').click()
+            time.sleep(1)
+        except:
+            print(f'\nNo more {type} news')
+            break
 
-# 找到搜索框
-#search_box = driver.find_element_by_name("q")  # Google搜索框的name属性是'q'
+    for data in newsBoxs:
+        result.append(
+            {
+                'link': data.find_elements(By.TAG_NAME, 'a')[2].get_attribute('href'),      
+                'title': data.find_elements(By.TAG_NAME, 'a')[2].text,
+                'type': type,
+            }
+        )
 
-# 输入搜索内容并提交
-#search_box.send_keys("Python")
-#search_box.send_keys(Keys.RETURN)  # 模拟按下回车键
+with open('./linkData/links-nbcnews.json', 'w', encoding = 'utf-8') as file:
+    json.dump(result, file, indent = 4)
+print(f'{len(result)} news link items saved')
 
-# 等待页面加载
-driver.implicitly_wait(10)  # 等待10秒
-
-# 关闭浏览器
 driver.quit()
