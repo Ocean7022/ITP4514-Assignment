@@ -1,9 +1,8 @@
-#import nbcnews
-import aljazeeranews
+import nbcnews
 
 cawlers = [
-    #nbcnews.nbcnews()
-    aljazeeranews.aljazeeranews()
+    nbcnews.nbcnews()
+    #aljazeeranews.aljazeeranews()
 ]
 
 for cawler in cawlers:

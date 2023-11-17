@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 import time, json, os
+from tqdm import tqdm
 
 class nbcnews:
     def __init__(self):
@@ -26,7 +27,7 @@ class nbcnews:
         for type in typeOfNews:
             self.driver.get(f'https://www.nbcnews.com/{type}')
             time.sleep(2)
-            for times in range(0, 1):
+            for times in range(0, 100):
                 self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
                 mainBox = self.driver.find_element(By.CLASS_NAME, 'styles_itemsContainer__saJYW')
                 newsBoxs = mainBox.find_elements(By.CLASS_NAME, 'wide-tease-item__wrapper')
@@ -38,7 +39,7 @@ class nbcnews:
                     print(f'\nNo more {type} news')
                     break
 
-            for data in newsBoxs:
+            for data in tqdm(newsBoxs, desc='Saving', ncols=100, unit=' item'):
                 self.result.append(
                     {
                         'link': data.find_elements(By.TAG_NAME, 'a')[2].get_attribute('href'),      
@@ -46,18 +47,16 @@ class nbcnews:
                         'type': type,
                     }
                 )
-                break
     
     def _cawlerPerPage(self):
-        for link in self.result:
+        for link in tqdm(self.result, desc='Cawlering', ncols=100, unit=' page'):
             self.driver.get(link['link'])
-            time.sleep(2)
+            time.sleep(1)
 
             mainContent = self.driver.find_elements(By.CLASS_NAME, 'article-body__content')
             pTab = []
             for content in mainContent:
                 pTab.append(content.find_elements(By.TAG_NAME, 'p'))
-            print(len(pTab))
 
             content = ''
             for p in pTab:

@@ -4,10 +4,10 @@ from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report, accuracy_score
 
-df = pd.read_json("./data/dataset.json")
+df = pd.read_json("../data/nbcnewsData.json")
 df["text"] = df["title"] + ". " + df["content"]
 
-self_words_list = pd.read_csv("./data/stopWordList.csv")["stop_word"]
+self_words_list = pd.read_csv("../data/stopWordList.csv")["stop_word"]
 all_stop_words = ENGLISH_STOP_WORDS.union(set(self_words_list))
 
 tfidf = TfidfVectorizer(
