@@ -3,7 +3,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
-import time, json
+import time, json, os
 
 class nbcnews:
     def __init__(self):
@@ -12,6 +12,7 @@ class nbcnews:
     def start(self):
         chrome_options = Options()
         chrome_options.add_experimental_option('detach', True)
+        chrome_options.add_argument("--log-level=3")
         service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
         
@@ -25,7 +26,7 @@ class nbcnews:
         for type in typeOfNews:
             self.driver.get(f'https://www.nbcnews.com/{type}')
             time.sleep(2)
-            for times in range(0, 100):
+            for times in range(0, 1):
                 self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
                 mainBox = self.driver.find_element(By.CLASS_NAME, 'styles_itemsContainer__saJYW')
                 newsBoxs = mainBox.find_elements(By.CLASS_NAME, 'wide-tease-item__wrapper')
@@ -45,9 +46,39 @@ class nbcnews:
                         'type': type,
                     }
                 )
+                break
     
     def _cawlerPerPage(self):
-        pass
+        for link in self.result:
+            self.driver.get(link['link'])
+            time.sleep(2)
+
+            mainContent = self.driver.find_elements(By.CLASS_NAME, 'article-body__content')
+            pTab = []
+            for content in mainContent:
+                pTab.append(content.find_elements(By.TAG_NAME, 'p'))
+            print(len(pTab))
+
+            content = ''
+            for p in pTab:
+                for data in p:
+                    content += data.text
+
+            pageResult = {
+                'title': link['title'],
+                'content': content,
+                'category': link['type'],
+            }
+
+            file_path = './newsData/nbcnewsData.json'
+            if os.path.exists(file_path):
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    data = json.load(file)
+            else:
+                data = []
+            data.append(pageResult)
+            with open(file_path, 'w', encoding='utf-8') as file:
+                json.dump(data, file, indent=4)
 
     def _outputLinksToFile(self):
         with open('./linkData/links-nbcnews.json', 'w', encoding = 'utf-8') as file:
