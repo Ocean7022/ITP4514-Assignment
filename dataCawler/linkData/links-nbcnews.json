@@ -1,5 +1,10 @@
 [
     {
+        "link": "https://www.nbcnews.com/health/health-news/disease-runs-rampant-gaza-clean-water-runs-rcna125091",
+        "title": "Disease runs rampant in Gaza as clean water runs out",
+        "type": "health"
+    },
+    {
         "link": "https://www.nbcnews.com/news/sports/cleveland-browns-qb-deshaun-watson-season-ending-shoulder-surgery-rcna125296",
         "title": "Browns QB Deshaun Watson sidelined by season-ending shoulder surgery after injury against the Ravens",
         "type": "health"
@@ -745,9 +750,29 @@
         "type": "health"
     },
     {
-        "link": "https://www.nbcnews.com/news/sports/lsu-safety-greg-brooks-emergency-surgery-remove-large-brain-tumor-fami-rcna108019",
-        "title": "LSU safety Greg Brooks has emergency surgery to remove a large brain tumor, family says",
-        "type": "health"
+        "link": "https://www.nbcnews.com/business/economy/tip-requests-seem-stay-re-also-widely-ignored-rcna125217",
+        "title": "From coffee shops to retail, Americans are tired of automated tip prompts everywhere",
+        "type": "business"
+    },
+    {
+        "link": "https://www.nbcnews.com/news/us-news/starbucks-workers-file-labor-complaints-nyc-union-goes-largest-ever-st-rcna125481",
+        "title": "Starbucks workers file more labor complaints with NYC as union goes on largest-ever strike",
+        "type": "business"
+    },
+    {
+        "link": "https://www.nbcnews.com/news/world/xi-jinping-china-pandas-california-biden-summit-rcna125471",
+        "title": "Pandas may finally be returning to California as Xi-Biden summit yields unlikely diplomatic win",
+        "type": "business"
+    },
+    {
+        "link": "https://www.nbcnews.com/politics/joe-biden/biden-chinas-xi-jinping-meet-effort-smooth-tensions-rcna124924",
+        "title": "Xi and Biden end yearlong silence, finding common ground on AI, fentanyl and military communications",
+        "type": "business"
+    },
+    {
+        "link": "https://www.nbcnews.com/business/consumer/holiday-shopping-season-slow-start-why-inflation-interest-rates-rcna125305",
+        "title": "Holiday shopping season might be off to a slow start",
+        "type": "business"
     },
     {
         "link": "https://www.nbcnews.com/business/business-news/disney-touts-40-billion-economic-impact-florida-desantis-court-battle-rcna125184",
@@ -1475,29 +1500,79 @@
         "type": "business"
     },
     {
-        "link": "https://www.nbcnews.com/politics/supreme-court/consumer-watchdog-crosshairs-supreme-court-weighs-legal-challenge-rcna118390",
-        "title": "Challenge to consumer watchdog gets a frosty reception at the Supreme Court",
-        "type": "business"
+        "link": "https://www.nbcnews.com/politics/congress/-reminded-january-6-democratic-lawmaker-describes-clash-dnc-rcna125526",
+        "title": "'It reminded me of Jan. 6': Democratic lawmaker describes clash outside the DNC",
+        "type": "politics"
     },
     {
-        "link": "https://www.nbcnews.com/news/nbcblk/grant-program-black-women-entrepreneurs-blocked-federal-appeals-court-rcna118363",
-        "title": "Grant program for Black female entrepreneurs blocked by federal appeals court",
-        "type": "business"
+        "link": "https://www.nbcnews.com/politics/supreme-court/supreme-court-declines-floridas-request-enforce-anti-drag-show-law-rcna123531",
+        "title": "Supreme Court declines Florida's request to enforce law targeting drag shows",
+        "type": "politics"
     },
     {
-        "link": "https://www.nbcnews.com/news/us-news/onewheel-electric-skateboards-recalled-4-reported-deaths-2019-rcna118264",
-        "title": "Onewheel electric skateboards recalled after 4 reported deaths since 2019",
-        "type": "business"
+        "link": "https://www.nbcnews.com/news/us-news/verdict-reached-paul-pelosi-hammer-attack-case-rcna125350",
+        "title": "David DePape found guilty in Paul Pelosi hammer attack case",
+        "type": "politics"
     },
     {
-        "link": "https://www.nbcnews.com/business/business-news/sam-bankman-fried-ftx-trial-begins-tuesday-what-know-rcna117591",
-        "title": "Trial of former FTX head Sam Bankman-Fried set to begin",
-        "type": "business"
+        "link": "https://www.nbcnews.com/politics/politics-news/new-hampshire-democratic-office-vandalized-antisemitic-white-supremaci-rcna125530",
+        "title": "New Hampshire Democratic office is vandalized with antisemitic and white supremacist symbols",
+        "type": "politics"
     },
     {
-        "link": "https://www.nbcnews.com/news/us-news/repayment-student-loan-debt-october-resumes-interest-inflation-rcna116955",
-        "title": "The 'terrifying' trade-offs millions of Americans face as student loan repayments resume",
-        "type": "business"
+        "link": "https://www.nbcnews.com/politics/white-house/chinas-xi-jinping-surprised-white-house-panda-diplomacy-rcna125566",
+        "title": "Are the pandas coming back? China's Xi Jinping surprised the White House",
+        "type": "politics"
+    },
+    {
+        "link": "https://www.nbcnews.com/nbc-out/out-politics-and-policy/californias-first-lesbian-senate-leader-make-history-runs-governor-rcna125539",
+        "title": "California's first lesbian Senate leader could make history again if she runs for governor",
+        "type": "politics"
+    },
+    {
+        "link": "https://www.nbcnews.com/politics/justice-department/justice-department-jail-safety-recommendations-center-rcna125201",
+        "title": "Justice Department launches hub to help jails improve conditions and safety",
+        "type": "politics"
+    },
+    {
+        "link": "https://www.nbcnews.com/politics/2024-election/new-york-democrats-seek-redo-bungled-gerrymander-rcna124881",
+        "title": "In a New York court, Democrats seek a redo after their bungled gerrymander",
+        "type": "politics"
+    },
+    {
+        "link": "https://www.nbcnews.com/politics/congress/lawmakers-press-biden-israeli-violence-west-bank-rcna125461",
+        "title": "Democratic lawmakers press Biden on Israeli violence in the West Bank",
+        "type": "politics"
+    },
+    {
+        "link": "https://www.nbcnews.com/politics/politics-news/capitol-police-evacuating-dnc-palestine-protest-turned-violent-rcna125459",
+        "title": "Police and pro-Palestinian demonstrators clash at DNC headquarters",
+        "type": "politics"
+    },
+    {
+        "link": "https://www.nbcnews.com/politics/2024-election/republican-presidential-primary-campaign-heavy-bloodlust-rcna125194",
+        "title": "The Republican presidential primary campaign is heavy on bloodlust",
+        "type": "politics"
+    },
+    {
+        "link": "https://www.nbcnews.com/politics/congress/senate-approve-funding-government-shutdown-stopgap-bill-rcna125325",
+        "title": "Senate passes stopgap funding bill to avert government shutdown, sending it to Biden\u2019s desk",
+        "type": "politics"
+    },
+    {
+        "link": "https://www.nbcnews.com/politics/joe-biden/biden-chinas-xi-jinping-meet-effort-smooth-tensions-rcna124924",
+        "title": "Xi and Biden end yearlong silence, finding common ground on AI, fentanyl and military communications",
+        "type": "politics"
+    },
+    {
+        "link": "https://www.nbcnews.com/politics/joe-biden/biden-supporters-new-hampshire-write-campaign-risks-underscoring-presi-rcna125345",
+        "title": "Biden supporters' New Hampshire write-in campaign risks underscoring the president's vulnerability",
+        "type": "politics"
+    },
+    {
+        "link": "https://www.nbcnews.com/politics/justice-department/anti-establishment-activist-sought-incite-trump-supporters-jan-6-doj-a-rcna125397",
+        "title": "'Antiestablishment' activist sought to incite Trump supporters on Jan. 6, DOJ argues",
+        "type": "politics"
     },
     {
         "link": "https://www.nbcnews.com/politics/donald-trump/lawyer-trump-co-defendant-georgia-case-admits-leaking-witness-videos-rcna125398",
@@ -1517,6 +1592,11 @@
     {
         "link": "https://www.nbcnews.com/politics/congress/ethics-report-rep-george-santos-wont-make-recommendations-house-action-rcna125421",
         "title": "Ethics report on Rep. George Santos won't make recommendations for House action",
+        "type": "politics"
+    },
+    {
+        "link": "https://www.nbcnews.com/politics/2024-election/new-hampshire-sets-presidential-primary-date-jan-23-defying-bidens-new-rcna125161",
+        "title": "N.H. sets presidential primary date for Jan. 23, defying Biden\u2019s new primary order",
         "type": "politics"
     },
     {
@@ -2170,88 +2250,13 @@
         "type": "politics"
     },
     {
-        "link": "https://www.nbcnews.com/politics/donald-trump/live-blog/ivanka-trump-fraud-trial-live-updates-rcna122519",
-        "title": "Ivanka Trump testifies she doesn\u2019t know much about financial documents in N.Y. fraud trial: Takeaways",
-        "type": "politics"
+        "link": "https://www.nbcnews.com/news/latino/taylor-swift-welcomed-brazil-christ-redeemer-statue-projection-rcna125542",
+        "title": "Brazil's Christ the Redeemer statue welcomes Taylor Swift with unique display",
+        "type": "culture-matters"
     },
     {
-        "link": "https://www.nbcnews.com/politics/white-house/top-biden-adviser-mitch-landrieu-expected-leave-white-house-rcna124114",
-        "title": "Top Biden adviser Mitch Landrieu expected to leave the White House",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/politics/elections/chuck-todd-elections-lay-bare-party-blind-spots-rest-us-see-rcna124007",
-        "title": "Chuck Todd's analysis: Elections lay bare the party blind spots the rest of us see",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/politics/2024-election/third-republican-debate-nbc-what-watch-expect-trump-rcna121829",
-        "title": "What to watch for in the third Republican debate",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/politics/elections/election-results-point-major-gop-liability-abortion-heading-2024-rcna123103",
-        "title": "Election results point to major GOP liability on abortion heading into 2024",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/politics/elections/2023-election-recap-key-takeaways-rcna123102",
-        "title": "Key takeaways from the 2023 elections: Democrats show strength beyond Biden",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/politics/elections/mississippi-gov-tate-reeves-wins-re-election-extending-republicans-two-rcna122075",
-        "title": "Republican Gov. Tate Reeves wins re-election in Mississippi",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/politics/elections/live-blog/election-day-voting-results-live-updates-rcna121782",
-        "title": "Election results: Ohio voters approve abortion protections; Kentucky re-elects Democrat",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/politics/elections/democrats-block-gop-bid-take-control-virginia-state-government-rcna122104",
-        "title": "Virginia Democrats block GOP bid to take full control of state government",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/politics/elections/houston-mayoral-race-will-go-runoff-month-john-whitmire-sheila-jackson-rcna122188",
-        "title": "John Whitmire and Sheila Jackson Lee advance to Houston mayor runoff",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/politics/congress/house-vote-censure-rashida-tlaib-israel-hamas-palestine-remarks-rcna124005",
-        "title": "House censures Rep. Rashida Tlaib over Israel remarks",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/politics/elections/ohio-votes-legalize-marijuana-recreational-use-2023-election-rcna122098",
-        "title": "Ohio votes to legalize marijuana for recreational use",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/politics/elections/ohio-voters-enshrine-abortion-rights-state-constitution-fall-roe-v-wad-rcna122077",
-        "title": "Ohio voters enshrine abortion rights in state constitution",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/politics/elections/democratic-governor-andy-beshear-wins-second-term-kentucky-rcna122072",
-        "title": "Democratic Gov. Andy Beshear wins re-election in Kentucky",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/politics/elections/former-biden-aide-gabe-amo-wins-rhode-island-house-special-election-rcna122109",
-        "title": "Former Biden aide Gabe Amo wins House special election in Rhode Island",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/politics/elections/cherelle-parker-become-first-female-philadelphia-mayor-election-win-rcna122107",
-        "title": "Democrat Cherelle Parker elected first female mayor of Philadelphia",
-        "type": "politics"
-    },
-    {
-        "link": "https://www.nbcnews.com/news/latino/latin-grammys-2023-how-to-watch-tonight-from-seville-spain-rcna125412",
-        "title": "Latin Grammys 2023: Everything to know ahead of this year's ceremony in Spain",
+        "link": "https://www.nbcnews.com/pop-culture/travis-kelce-old-tweets-go-viral-rcna125423",
+        "title": "Travis Kelce's old tweets are resurfacing online, and some Swifties are here for it",
         "type": "culture-matters"
     },
     {
@@ -2267,6 +2272,11 @@
     {
         "link": "https://www.nbcnews.com/pop-culture/gwyneth-paltrow-ski-trial-musical-debut-london-rcna125366",
         "title": "Gwyneth Paltrow ski trial musical to debut in London",
+        "type": "culture-matters"
+    },
+    {
+        "link": "https://www.nbcnews.com/pop-culture/celebrity/taylor-swift-travis-kelce-relationship-raising-dating-standards-rcna124991",
+        "title": "How Taylor Swift and Travis Kelce are inspiring people to raise their dating standards",
         "type": "culture-matters"
     },
     {
@@ -2402,6 +2412,11 @@
     {
         "link": "https://www.nbcnews.com/pop-culture/pop-culture-news/matthew-perry-friends-actor-dies-apparent-drowning-54-rcna122643",
         "title": "Matthew Perry, \u2018Friends\u2019 actor, dies of apparent drowning at 54",
+        "type": "culture-matters"
+    },
+    {
+        "link": "https://www.nbcnews.com/news/matilda-djerf-avenue-dupes-copyright-strikes-controversy-rcna121901",
+        "title": "An influencer took down 'dupe' videos of her designs. People were divided on the move.",
         "type": "culture-matters"
     },
     {
@@ -2982,21 +2997,6 @@
     {
         "link": "https://www.nbcnews.com/news/latino/nbcuniversal-news-group-chairman-cesar-conde-top-honorees-hispanic-her-rcna103852",
         "title": "NBCUniversal News Group chairman Cesar Conde among top honorees at Hispanic Heritage Awards",
-        "type": "culture-matters"
-    },
-    {
-        "link": "https://www.nbcnews.com/news/world/freddie-mercury-queen-greatest-hits-auction-piano-elton-john-rcna103887",
-        "title": "The prized piano Freddie Mercury used to compose Queen\u2019s greatest hits is the champion at a pricy auction",
-        "type": "culture-matters"
-    },
-    {
-        "link": "https://www.nbcnews.com/tech/internet/was-childfree-woman-enjoying-saturday-came-culture-warriors-rcna103581",
-        "title": "She was a child-free woman enjoying her Saturday. Then came the culture warriors.",
-        "type": "culture-matters"
-    },
-    {
-        "link": "https://www.nbcnews.com/news/asian-america/trader-joes-kimbap-tiktok-rcna103403",
-        "title": "Trader Joe's unconventional take on the Kimbap is selling out after going viral",
         "type": "culture-matters"
     }
 ]
