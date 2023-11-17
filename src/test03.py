@@ -4,14 +4,14 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 from tqdm import tqdm
 
-df = pd.read_json("./data/dataset.json")
+df = pd.read_json("../data/nbcnewsData.json")
 df["text"] = df["title"] + ". " + df["content"]
 
-self_words_list = pd.read_csv("./data/stopWordList.csv")["stop_word"]
+self_words_list = pd.read_csv("../data/stopWordList.csv")["stop_word"]
 all_stop_words = ENGLISH_STOP_WORDS.union(set(self_words_list))
 
 tfidf = TfidfVectorizer(
-    max_features=5000, stop_words=list(all_stop_words), token_pattern=r"\b[a-zA-Z]+\b"
+    max_features=5000, stop_words=list(all_stop_words), token_pattern=r'\b[a-zA-Z]{2,}\b'
 )
 features_per_category = {}
 

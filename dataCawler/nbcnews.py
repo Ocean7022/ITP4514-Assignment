@@ -39,7 +39,7 @@ class nbcnews:
                     print(f'\nNo more {type} news')
                     break
 
-            for data in tqdm(newsBoxs, desc='Saving', ncols=100, unit=' item'):
+            for data in tqdm(newsBoxs, desc='Getting links data', ncols=100, unit=' item'):
                 self.result.append(
                     {
                         'link': data.find_elements(By.TAG_NAME, 'a')[2].get_attribute('href'),      
