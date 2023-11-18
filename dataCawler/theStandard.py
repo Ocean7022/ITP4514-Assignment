@@ -57,19 +57,25 @@ class theStandard:
                 secondbox = mainbox.find_elements(By.CLASS_NAME,'caption')
                 if len(secondbox) >= totalNumOfNwes:
                     progress.update(totalNumOfNwes - lastCollenctedNum)
+                    progress.close()
                     break
                 else:
                     progress.update(len(secondbox) - lastCollenctedNum)
                     lastCollenctedNum = len(secondbox)
 
-                try:
-                    self.driver.find_element(By.CLASS_NAME,'show-more').click()
-                    time.sleep(random.uniform(2.0, 5.0))    
-                except:
-                    print(f'\nNo {type}:{value} more news')
-                    break
-            progress.close()
+                for i in range(0, 10):
+                    try:
+                        self.driver.find_element(By.CLASS_NAME,'show-more').click()
+                        time.sleep(random.uniform(2.0, 5.0))
+                        break
+                    except:
+                        pass
+                    if i == 10:
+                        progress.close()
+                        print(f'Error to load more news, {len(secondbox)} news collected')
+                        break
 
+            print(f'{len(secondbox)} {type} news items found')
             for data in tqdm(secondbox, desc='Saving', unit='item'):
                 self.result.append(
                    {
@@ -84,7 +90,7 @@ class theStandard:
             with open('./linkData/links-theStandard.json', 'r', encoding='utf-8') as file:
                 self.result = json.load(file)
 
-        for link in self.result:
+        for link in tqdm(self.result, desc='Cawlering', unit='page'):
             self.driver.get(link['link'])
             time.sleep(1)
 

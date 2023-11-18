@@ -11,6 +11,7 @@ class aljazeeranews:
         self.result = []
         self.useJSON = useJSON
         self.onlyGetLinks = onlyGetLinks
+        self.articles = []
 
     def start(self):
         chrome_options = Options()
@@ -64,7 +65,7 @@ class aljazeeranews:
                     time.sleep(random.uniform(2.0, 5.0))
                 except:
                     # retry 10 times
-                    for range in range(10):
+                    for i in range(0, 10):
                         try:
                             show_more_button = self.driver.find_element(By.CLASS_NAME, 'show-more-button')
                             clickTargrt = show_more_button.find_elements(By.TAG_NAME, 'span')
@@ -87,11 +88,30 @@ class aljazeeranews:
             with open('./linkData/links-aljazeeranews.json', 'r', encoding='utf-8') as file:
                 self.result = json.load(file)
 
+        for item in tqdm(self.result, desc='Cawlering', unit='page'):
+            self._getArticleContent(item)
 
-        
-        pass
+        with open('./newsData/aljazeerayData.json', 'w', encoding='utf-8') as file:
+            json.dump(self.articles, file, indent=4)
+
+    def _getArticleContent(self, link_data):
+        self.driver.get(link_data['link'])
+        time.sleep(2)
+
+        try:
+            content_area = self.driver.find_element(By.CSS_SELECTOR, 'main#main-content-area')
+            paragraphs = content_area.find_elements(By.CSS_SELECTOR, 'p')
+            content = ' '.join([p.text for p in paragraphs if p.text])
+
+            self.articles.append({
+                "title": link_data['title'],
+                "content": content,
+                "category": link_data['type']
+            })
+        except:
+            pass
 
     def _outputLinksToFile(self):
-        with open('links-aljazeeray.json', 'w', encoding='utf-8') as file:
+        with open('./linkData/links-aljazeeray.json', 'w', encoding='utf-8') as file:
             json.dump(self.result, file, indent=4)
         print(f'\n{len(self.result)} news link items saved')
