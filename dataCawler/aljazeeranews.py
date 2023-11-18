@@ -49,6 +49,7 @@ class aljazeeranews:
             while True:
                 news_items = self.driver.find_elements(By.CSS_SELECTOR, 'article.gc')
                 if len(news_items) >= totalNumOfNwes:
+                    progress.close()
                     progress.update(totalNumOfNwes - lastCollenctedNum)
                     break
                 else:
@@ -62,9 +63,19 @@ class aljazeeranews:
                     clickTargrt[1].click()
                     time.sleep(random.uniform(2.0, 5.0))
                 except:
-                    print(f'\nNo more {type} news')
+                    # retry 10 times
+                    for range in range(10):
+                        try:
+                            show_more_button = self.driver.find_element(By.CLASS_NAME, 'show-more-button')
+                            clickTargrt = show_more_button.find_elements(By.TAG_NAME, 'span')
+                            self.driver.execute_script("arguments[0].scrollIntoView();", show_more_button)
+                            clickTargrt[1].click()
+                            time.sleep(random.uniform(2.0, 5.0))
+                        except:
+                            pass
+                    progress.close()
+                    print(f'Error to load more news, {len(news_items)} news collected')
                     break
-            progress.close()
 
             for item in tqdm(news_items, desc='Saving', unit='item'):
                 link = item.find_element(By.CSS_SELECTOR, 'a.u-clickable-card__link').get_attribute('href')
