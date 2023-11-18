@@ -3,7 +3,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
-import time, json, os
+import time, json, os, random
 from tqdm import tqdm
 
 class theStandard:
@@ -34,6 +34,7 @@ class theStandard:
                 'travel' : 'travel',
                 'culture' : 'art-and-culture',
                 'health' : 'health-Beauty',
+                'technology' : 'technology'
             }
             self._getLinks(typeOfNews)
             self._outputLinksToFile()
@@ -44,24 +45,30 @@ class theStandard:
 
     def _getLinks(self,typeOfNews):
         for type, value in typeOfNews.items():
-            self.driver.get(f'https://www.thestandard.com.hk/section-news-list/section/{value}/')
-            time.sleep(1)
+            self.driver.get(f'https://www.thestandard.com.hk/section-news-list/feature/{value}/')     
+            time.sleep(random.uniform(2.0, 3.0))
             mainbox = self.driver.find_element(By.XPATH,'/html/body/div[2]/div/div[1]/div[1]/div')
 
-            totalNumOfNwes = 10000
-            progress = tqdm(total = totalNumOfNwes, desc = 'Collecting', unit = ' item')
+            totalNumOfNwes = 100
+            lastCollenctedNum = 0
+            progress = tqdm(total = totalNumOfNwes, desc = 'Collecting', unit = 'item', leave=True)
             while True:
                 self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
                 secondbox = mainbox.find_elements(By.CLASS_NAME,'caption')
-                progress.update(len(secondbox))
                 if len(secondbox) >= totalNumOfNwes:
+                    progress.update(totalNumOfNwes - lastCollenctedNum)
                     break
+                else:
+                    progress.update(len(secondbox) - lastCollenctedNum)
+                    lastCollenctedNum = len(secondbox)
+
                 try:
                     self.driver.find_element(By.CLASS_NAME,'show-more').click()
-                    time.sleep(1)
+                    time.sleep(random.uniform(2.0, 5.0))    
                 except:
                     print(f'\nNo {type}:{value} more news')
                     break
+            progress.close()
 
             for data in tqdm(secondbox, desc='Saving', unit='item'):
                 self.result.append(

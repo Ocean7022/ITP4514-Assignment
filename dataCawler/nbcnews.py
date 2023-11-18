@@ -3,7 +3,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
-import time, json, os
+import time, json, os, random
 from tqdm import tqdm
 
 class nbcnews:
@@ -36,7 +36,7 @@ class nbcnews:
     def _getLinks(self, typeOfNews):
         for type in typeOfNews:
             self.driver.get(f'https://www.nbcnews.com/{type}')
-            time.sleep(1)
+            time.sleep(random.uniform(1.0, 3.0))
             for times in range(0, 100):
                 self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
                 mainBox = self.driver.find_element(By.CLASS_NAME, 'styles_itemsContainer__saJYW')
@@ -44,7 +44,7 @@ class nbcnews:
                 print(f'\r{len(newsBoxs)} {type} news items found', end='')
                 try:
                     self.driver.find_element(By.CLASS_NAME, 'styles_loadMoreWrapper__pOldr').find_element(By.TAG_NAME, 'button').click()
-                    time.sleep(1)
+                    time.sleep(random.uniform(1.0, 4.0))
                 except:
                     print(f'\nNo more {type} news')
                     break
@@ -75,7 +75,7 @@ class nbcnews:
             content = ''
             for p in pTab:
                 for data in p:
-                    content += data.text
+                    content += data.text + ' '
 
             pageResult = {
                 'title': link['title'],
