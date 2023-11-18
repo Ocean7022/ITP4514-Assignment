@@ -7,8 +7,10 @@ import time, json, os
 from tqdm import tqdm
 
 class nbcnews:
-    def __init__(self):
+    def __init__(self, useJSON = False, onlyGetLinks = False):
         self.result = []
+        self.useJSON = useJSON
+        self.onlyGetLinks = onlyGetLinks
         
     def start(self):
         chrome_options = Options()
@@ -17,16 +19,24 @@ class nbcnews:
         service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
         
-        typeOfNews = ['health', 'business', 'politics', 'culture-matters']
-        self._getLinks(typeOfNews)
-        self._outputLinksToFile()
-        self._cawlerPerPage()
+        if self.useJSON:
+            print('Using JSON file')
+        if self.onlyGetLinks:
+            print('Only get links')
+
+        if not self.useJSON:
+            typeOfNews = ['health', 'business', 'politics', 'culture-matters']
+            self._getLinks(typeOfNews)
+            self._outputLinksToFile()
+        if not self.onlyGetLinks:
+            self._cawlerPerPage()
+        print('Cawlering done')
         self.driver.quit()
 
     def _getLinks(self, typeOfNews):
         for type in typeOfNews:
             self.driver.get(f'https://www.nbcnews.com/{type}')
-            time.sleep(2)
+            time.sleep(1)
             for times in range(0, 100):
                 self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
                 mainBox = self.driver.find_element(By.CLASS_NAME, 'styles_itemsContainer__saJYW')
@@ -39,7 +49,7 @@ class nbcnews:
                     print(f'\nNo more {type} news')
                     break
 
-            for data in tqdm(newsBoxs, desc='Getting links data', ncols=100, unit=' item'):
+            for data in tqdm(newsBoxs, desc='Saving', unit='item'):
                 self.result.append(
                     {
                         'link': data.find_elements(By.TAG_NAME, 'a')[2].get_attribute('href'),      
@@ -49,7 +59,11 @@ class nbcnews:
                 )
     
     def _cawlerPerPage(self):
-        for link in tqdm(self.result, desc='Cawlering', ncols=100, unit=' page'):
+        if self.useJSON:
+            with open('./linkData/links-nbcnews.json', 'r', encoding='utf-8') as file:
+                self.result = json.load(file)
+
+        for link in tqdm(self.result, desc='Cawlering', unit='page'):
             self.driver.get(link['link'])
             time.sleep(1)
 
@@ -66,7 +80,7 @@ class nbcnews:
             pageResult = {
                 'title': link['title'],
                 'content': content,
-                'category': link['type'],
+                'category': 'culture' if link['type'] == 'culture-matters' else link['type']
             }
 
             file_path = './newsData/nbcnewsData.json'

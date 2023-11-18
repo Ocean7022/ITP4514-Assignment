@@ -3,15 +3,16 @@ from sklearn.model_selection import train_test_split  # 從scikit-learn導入用
 from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS  # 導入用於文本特徵提取的工具
 from sklearn.naive_bayes import MultinomialNB  # 導入多項式朴素貝葉斯分類器
 from sklearn.metrics import classification_report, accuracy_score  # 導入評估模型性能的工具
+import config.nbConfig as config
 
-df = pd.read_json("../data/nbcnewsData.json")  # 從JSON文件加載數據到pandas DataFrame
+df = pd.read_json(config.dataSetPath)  # 從JSON文件加載數據到pandas DataFrame
 df["text"] = df["title"] + ". " + df["content"]  # 結合標題和內容到一個新的列‘text’
 
-self_words_list = pd.read_csv("../data/stopWordList.csv")["stop_word"]  # 從CSV文件加載自定義停用詞列表
+self_words_list = pd.read_csv(config.stopWordListPath)["stop_word"]  # 從CSV文件加載自定義停用詞列表
 all_stop_words = ENGLISH_STOP_WORDS.union(set(self_words_list))  # 結合scikit-learn的英語停用詞和自定義停用詞
 
 tfidf = TfidfVectorizer(
-    max_features=5000, stop_words=list(all_stop_words), token_pattern=r'\b[a-zA-Z]{2,}\b'
+    #max_features=5000, stop_words=list(all_stop_words), token_pattern=r'\b[a-zA-Z]{2,}\b'
 )  # 初始化TF-IDF向量化器，設置最大特徵數，停用詞和令牌模式
 X = tfidf.fit_transform(df['text'])  # 將文本數據轉換為TF-IDF特徵
 y = df['category']  # 設置目標變量為‘category’列
