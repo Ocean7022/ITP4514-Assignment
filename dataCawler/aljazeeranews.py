@@ -17,6 +17,7 @@ class aljazeeranews:
         chrome_options = Options()
         chrome_options.add_experimental_option('detach', True)
         chrome_options.add_argument("--log-level=3")
+        chrome_options.add_argument("--headless")
         service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
         
@@ -44,14 +45,14 @@ class aljazeeranews:
             print('Web page loaded')
             time.sleep(1)
 
-            totalNumOfNwes = 50
+            totalNumOfNwes = 20000
             lastCollenctedNum = 0
             progress = tqdm(total = totalNumOfNwes, desc = 'Collecting', unit = 'item', leave=True)
             while True:
                 news_items = self.driver.find_elements(By.CSS_SELECTOR, 'article.gc')
                 if len(news_items) >= totalNumOfNwes:
-                    progress.close()
                     progress.update(totalNumOfNwes - lastCollenctedNum)
+                    progress.close()
                     break
                 else:
                     progress.update(len(news_items) - lastCollenctedNum)
@@ -103,7 +104,8 @@ class aljazeeranews:
             pageResult = {
                 "title": link_data['title'],
                 "content": content,
-                "category": link_data['type']
+                "category": link_data['type'],
+                'link': link_data['link'],
             }
 
             file_path = './newsData/aljazeerayData.json'

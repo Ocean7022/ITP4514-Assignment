@@ -16,6 +16,7 @@ class nbcnews:
         chrome_options = Options()
         chrome_options.add_experimental_option('detach', True)
         chrome_options.add_argument("--log-level=3")
+        chrome_options.add_argument("--headless")
         service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
         
@@ -80,7 +81,8 @@ class nbcnews:
             pageResult = {
                 'title': link['title'],
                 'content': content,
-                'category': 'culture' if link['type'] == 'culture-matters' else link['type']
+                'category': 'culture' if link['type'] == 'culture-matters' else link['type'],
+                'link': link['link']
             }
 
             file_path = './newsData/nbcnewsData.json'

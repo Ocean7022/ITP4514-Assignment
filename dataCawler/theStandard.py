@@ -16,6 +16,7 @@ class theStandard:
         chrome_options = Options()
         chrome_options.add_experimental_option('detach', True)
         chrome_options.add_argument("--log-level=3")
+        chrome_options.add_argument("--headless")
         service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
         
@@ -49,7 +50,7 @@ class theStandard:
             time.sleep(random.uniform(2.0, 3.0))
             mainbox = self.driver.find_element(By.XPATH,'/html/body/div[2]/div/div[1]/div[1]/div')
 
-            totalNumOfNwes = 100
+            totalNumOfNwes = 20000
             lastCollenctedNum = 0
             progress = tqdm(total = totalNumOfNwes, desc = 'Collecting', unit = 'item', leave=True)
             while True:
@@ -104,7 +105,8 @@ class theStandard:
             pageResult = {
                 'title': link['title'],
                 'content': content,
-                'category': link['type']
+                'category': link['type'],
+                'link': link['link']
             }
 
             file_path = './newsData/theStandard.json'
