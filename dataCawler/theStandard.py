@@ -16,7 +16,7 @@ class theStandard:
         chrome_options = Options()
         chrome_options.add_experimental_option('detach', True)
         chrome_options.add_argument("--log-level=3")
-        chrome_options.add_argument("--headless")
+        #chrome_options.add_argument("--headless")
         service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
         
@@ -46,6 +46,7 @@ class theStandard:
 
     def _getLinks(self,typeOfNews):
         for type, value in typeOfNews.items():
+            isError = False
             self.driver.get(f'https://www.thestandard.com.hk/section-news-list/feature/{value}/')     
             time.sleep(random.uniform(2.0, 3.0))
             mainbox = self.driver.find_element(By.XPATH,'/html/body/div[2]/div/div[1]/div[1]/div')
@@ -71,10 +72,12 @@ class theStandard:
                         break
                     except:
                         pass
-                    if i == 10:
+                    if i == 9:
                         progress.close()
                         print(f'Error to load more news, {len(secondbox)} news collected')
-                        break
+                        isError = True
+                if isError:
+                    break
 
             print(f'{len(secondbox)} {type} news items found')
             for data in tqdm(secondbox, desc='Saving', unit='item'):
