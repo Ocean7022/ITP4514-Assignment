@@ -1,9 +1,9 @@
 import nbcnews, theStandard, aljazeeranews
 
 cawlers = [
-    #nbcnews.nbcnews(useJSON = False, onlyGetLinks = True),
+    nbcnews.nbcnews(useJSON = False, onlyGetLinks = False),
     #theStandard.theStandard(useJSON = False, onlyGetLinks = True),
-    aljazeeranews.aljazeeranews(useJSON = False, onlyGetLinks = True)
+    #aljazeeranews.aljazeeranews(useJSON = False, onlyGetLinks = True)
 ]
 
 cawlers[0].start()

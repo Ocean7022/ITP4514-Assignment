@@ -44,7 +44,7 @@ class aljazeeranews:
             print('Web page loaded')
             time.sleep(1)
 
-            totalNumOfNwes = 20000
+            totalNumOfNwes = 50
             lastCollenctedNum = 0
             progress = tqdm(total = totalNumOfNwes, desc = 'Collecting', unit = 'item', leave=True)
             while True:
@@ -91,9 +91,6 @@ class aljazeeranews:
         for item in tqdm(self.result, desc='Cawlering', unit='page'):
             self._getArticleContent(item)
 
-        with open('./newsData/aljazeerayData.json', 'w', encoding='utf-8') as file:
-            json.dump(self.articles, file, indent=4)
-
     def _getArticleContent(self, link_data):
         self.driver.get(link_data['link'])
         time.sleep(2)
@@ -103,11 +100,21 @@ class aljazeeranews:
             paragraphs = content_area.find_elements(By.CSS_SELECTOR, 'p')
             content = ' '.join([p.text for p in paragraphs if p.text])
 
-            self.articles.append({
+            pageResult = {
                 "title": link_data['title'],
                 "content": content,
                 "category": link_data['type']
-            })
+            }
+
+            file_path = './newsData/aljazeerayData.json'
+            if os.path.exists(file_path):
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    data = json.load(file)
+            else:
+                data = []
+            data.append(pageResult)
+            with open(file_path, 'w', encoding='utf-8') as file:
+                json.dump(data, file, indent=4)
         except:
             pass
 
