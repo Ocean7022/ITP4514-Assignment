@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split  # 從scikit-learn導入用
 from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS  # 導入用於文本特徵提取的工具
 from sklearn.naive_bayes import MultinomialNB  # 導入多項式朴素貝葉斯分類器
 from sklearn.metrics import classification_report, accuracy_score  # 導入評估模型性能的工具
-import config.nbConfig as config
+import config.Config as config
 
 print("Loading dataset...")
 df = pd.read_json(config.dataSetPath)

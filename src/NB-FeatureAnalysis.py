@@ -3,7 +3,7 @@ import pandas as pd  # 導入 pandas 庫，用於數據處理
 from sklearn.feature_extraction.text import TfidfVectorizer  # 從 scikit-learn 導入文本特徵提取工具
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS  # 導入英語的停用詞集
 from tqdm import tqdm  # 導入 tqdm 庫，用於顯示進度條
-import config.nbConfig as config
+import config.Config as config
 
 print("Loading dataset...")
 df = pd.read_json(config.dataSetPath)
