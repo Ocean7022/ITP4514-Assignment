@@ -5,11 +5,15 @@ from sklearn.naive_bayes import MultinomialNB  # 導入多項式朴素貝葉斯�
 from sklearn.metrics import classification_report, accuracy_score  # 導入評估模型性能的工具
 import config.nbConfig as config
 
-df = pd.read_json(config.dataSetPath)  # 從JSON文件加載數據到pandas DataFrame
-df["text"] = df["title"] + ". " + df["content"]  # 結合標題和內容到一個新的列‘text’
+print("Loading dataset...")
+df = pd.read_json(config.dataSetPath)
+df["text"] = df["title"] + ". " + df["content"]
+print("Dataset loaded")
 
-self_words_list = pd.read_csv(config.stopWordListPath)["stop_word"]  # 從CSV文件加載自定義停用詞列表
-all_stop_words = ENGLISH_STOP_WORDS.union(set(self_words_list))  # 結合scikit-learn的英語停用詞和自定義停用詞
+print("Calculating TF-IDF scores...")
+self_words_list = pd.read_csv(config.stopWordListPath)["stop_word"]
+all_stop_words = ENGLISH_STOP_WORDS.union(set(self_words_list))
+print(f"Total number of stop words: {len(all_stop_words)}")
 
 tfidf = TfidfVectorizer(
     #max_features=5000, stop_words=list(all_stop_words), token_pattern=r'\b[a-zA-Z]{2,}\b'

@@ -11,12 +11,13 @@ class theStandard:
         self.result = []
         self.useJSON = useJSON
         self.onlyGetLinks = onlyGetLinks
+        print('theStandard cawler init')
         
     def start(self):
         chrome_options = Options()
         chrome_options.add_experimental_option('detach', True)
         chrome_options.add_argument("--log-level=3")
-        #chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--headless")
         service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
         
@@ -50,33 +51,37 @@ class theStandard:
             time.sleep(random.uniform(2.0, 3.0))
             mainbox = self.driver.find_element(By.XPATH,'/html/body/div[2]/div/div[1]/div[1]/div')
 
-            totalNumOfNwes = 20000
+            totalNumOfNews = 10000
             lastCollenctedNum = 0
-            progress = tqdm(total = totalNumOfNwes, desc = 'Collecting', unit = 'item', leave=True)
+            progress = tqdm(total = totalNumOfNews, desc = 'Collecting', unit = 'item', leave=True)
             while True:
-                self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
-                secondbox = mainbox.find_elements(By.CLASS_NAME,'caption')
+                try:
+                    self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
+                    secondbox = mainbox.find_elements(By.CLASS_NAME,'caption')
+                    self.driver.find_element(By.CLASS_NAME,'show-more').click()
+                    time.sleep(random.uniform(2.0, 5.0))
 
-                if len(secondbox) >= totalNumOfNwes:
-                    progress.update(totalNumOfNwes - lastCollenctedNum)
-                    progress.close()
-                    break
-                else:
-                    progress.update(len(secondbox) - lastCollenctedNum)
-                    lastCollenctedNum = len(secondbox)
-
-                startTime = time.time()
-                while True:
-                    try:
-                        self.driver.find_element(By.CLASS_NAME,'show-more').click()
-                        time.sleep(random.uniform(2.0, 5.0))
-                        if time.time() - startTime > 60:
-                            break
-                    except:
+                    if len(secondbox) >= totalNumOfNews:
+                        progress.update(totalNumOfNews - lastCollenctedNum)
                         progress.close()
-                        print('Error to get news more items')
-                        print(len(secondbox), 'news link collected')
                         break
+                    elif len(secondbox) == lastCollenctedNum:
+                        startTime = time.time()
+                        while True:
+                            self.driver.find_element(By.CLASS_NAME,'show-more').click()
+                            time.sleep(random.uniform(2.0, 5.0))
+                            if len(mainbox.find_elements(By.CLASS_NAME,'caption')) > lastCollenctedNum:
+                                break
+                            elif time.time() - startTime > 60:
+                                raise Exception
+                    else:
+                        progress.update(len(secondbox) - lastCollenctedNum)
+                        lastCollenctedNum = len(secondbox)
+                except:
+                    progress.close()
+                    print('Error to get more news')
+                    print(len(secondbox), 'news link collected')
+                    break
 
             print(f'{len(secondbox)} {type} news items found')
             for data in tqdm(secondbox, desc='Saving', unit='item'):
@@ -102,7 +107,7 @@ class theStandard:
 
             content = ''
             for p in pTabs:
-                content+=p.text
+                content+=p.text + ' '
 
             pageResult = {
                 'title': link['title'],
