@@ -3,7 +3,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
-import time, json, os, random
+import time, json, os, random, time
 from tqdm import tqdm
 
 class theStandard:
@@ -46,7 +46,6 @@ class theStandard:
 
     def _getLinks(self,typeOfNews):
         for type, value in typeOfNews.items():
-            isError = False
             self.driver.get(f'https://www.thestandard.com.hk/section-news-list/feature/{value}/')     
             time.sleep(random.uniform(2.0, 3.0))
             mainbox = self.driver.find_element(By.XPATH,'/html/body/div[2]/div/div[1]/div[1]/div')
@@ -57,6 +56,7 @@ class theStandard:
             while True:
                 self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
                 secondbox = mainbox.find_elements(By.CLASS_NAME,'caption')
+
                 if len(secondbox) >= totalNumOfNwes:
                     progress.update(totalNumOfNwes - lastCollenctedNum)
                     progress.close()
@@ -65,24 +65,23 @@ class theStandard:
                     progress.update(len(secondbox) - lastCollenctedNum)
                     lastCollenctedNum = len(secondbox)
 
-                for i in range(0, 10):
+                startTime = time.time()
+                while True:
                     try:
                         self.driver.find_element(By.CLASS_NAME,'show-more').click()
                         time.sleep(random.uniform(2.0, 5.0))
-                        break
+                        if time.time() - startTime > 60:
+                            break
                     except:
-                        pass
-                    if i == 9:
                         progress.close()
-                        print(f'Error to load more news, {len(secondbox)} news collected')
-                        isError = True
-                if isError:
-                    break
+                        print('Error to get news more items')
+                        print(len(secondbox), 'news link collected')
+                        break
 
             print(f'{len(secondbox)} {type} news items found')
             for data in tqdm(secondbox, desc='Saving', unit='item'):
                 self.result.append(
-                   {
+                {
                         'link': data.find_elements(By.TAG_NAME, 'a')[0].get_attribute('href'),      
                         'title': data.find_elements(By.TAG_NAME, 'h1')[0].text,
                         'type': type
