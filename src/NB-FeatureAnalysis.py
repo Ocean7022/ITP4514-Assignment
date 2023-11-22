@@ -8,16 +8,13 @@ import config.Config as config
 print("Loading dataset...")
 df = pd.read_json(config.dataSetPath)
 df["text"] = df["title"] + ". " + df["content"]
-print("Dataset loaded")
-
-print("Calculating TF-IDF scores...")
-self_words_list = pd.read_csv(config.stopWordListPath)["stop_word"]
-all_stop_words = ENGLISH_STOP_WORDS.union(set(self_words_list))
-print(f"Total number of stop words: {len(all_stop_words)}")
+print(len(df), 'data loaded from dataset')
 
 tfidf = TfidfVectorizer(
-    #max_features=5000, stop_words=list(all_stop_words), token_pattern=r'\b[a-zA-Z]{2,}\b'
-)  # 初始化 TF-IDF 向量化器，設置最大特徵數量、停用詞和令牌模式
+    max_features=5000,
+    stop_words=list(ENGLISH_STOP_WORDS.union(set(pd.read_csv(config.stopWordListPath)['stop_word']))),
+    token_pattern=r'\b[a-zA-Z]{2,}\b'
+)  # 初始化TF-IDF向量化器，設置最大特徵數，停用詞和令牌模式
 
 features_per_category = {}  # 創建一個空字典，用於存儲每個類別的特徵
 
@@ -33,7 +30,6 @@ for category in tqdm(
     features_per_category[category] = sorted_scores[:10]  # 為每個類別存儲前 10 個最高分數的特徵
 
 for category in features_per_category:  # 遍歷每個類別
-    print(f"Category: {category}")  # 打印類別名稱
+    print(f"\nCategory: {category}")  # 打印類別名稱
     for score, feature in features_per_category[category]:  # 遍歷該類別的前 10 個特徵
         print(f"{feature}: {score}")  # 打印特徵名稱和對應的分數
-    print("\n")  # 打印一個空行，用於分隔不同的類別
