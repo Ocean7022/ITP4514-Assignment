@@ -16,7 +16,7 @@ class cnnnews:
         chrome_options = Options()
         chrome_options.add_experimental_option('detach', True)
         chrome_options.add_argument("--log-level=3")
-        chrome_options.add_argument("--headless")
+        #chrome_options.add_argument("--headless")
         service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
         
@@ -109,15 +109,27 @@ class cnnnews:
         print(f'{len(data)} news link items saved')
 
     def getPoliticsLinks(self):
+        print('Loading web page')
+        self.driver.get('https://edition.cnn.com/search?q=')
+        time.sleep(random.uniform(5.0, 7.0))
+        print('Web page loaded')
+
         size = 100
         totalNumOfNews = 15000
         progress = tqdm(total = totalNumOfNews, desc = 'Collecting', unit = 'item', leave=True)
-        for page in range(0, 100):
+        for page in range(1, 100):
             try:
                 self.driver.get(f'https://edition.cnn.com/search?q=politics&from={page * size - size}&size={size}&page={page}&sort=newest&types=article&section=')
                 time.sleep(random.uniform(3.0, 5.0))
                 mainBox = self.driver.find_element(By.CLASS_NAME, 'container_list-images-with-description__field-links')
                 divs = mainBox.find_elements(By.CLASS_NAME, 'container__item--type-media-image')
+
+                file_path = './linkData/links-cnnnews.json'
+                if os.path.exists(file_path):
+                    with open(file_path, 'r', encoding='utf-8') as file:
+                        oldData = json.load(file)
+                else:
+                    oldData = []
 
                 for div in divs:
                     link = div.find_element(By.TAG_NAME, 'a').get_attribute('href')
@@ -129,22 +141,19 @@ class cnnnews:
                         'title': div.find_element(By.TAG_NAME, 'span').text,
                         'type': 'politics'
                     }
-                    file_path = './linkData/links-cnnnews.json'
-                    if os.path.exists(file_path):
-                        with open(file_path, 'r', encoding='utf-8') as file:
-                            data = json.load(file)
-                    else:
-                        data = []
-                    data.append(data)
-                    with open(file_path, 'w', encoding='utf-8') as file:
-                        json.dump(data, file, indent=4)
+                    oldData.append(data)
                     progress.update(1)
+
+                with open(file_path, 'w', encoding='utf-8') as file:
+                    json.dump(oldData, file, indent=4)
                 
-                if len(data) > totalNumOfNews:
+                if len(oldData) > totalNumOfNews:
                     progress.close()
                     break
-            except:
+            except Exception as e:
                 progress.close()
                 print('Error to get more news')
+                with open('./error-cnn.txt', 'a', encoding='utf-8') as file:
+                    file.write('\n' + str(e) + '\n')
                 break
         
