@@ -97,25 +97,35 @@ class theStandard:
         if self.useJSON:
             with open('./linkData/links-theStandard.json', 'r', encoding='utf-8') as file:
                 self.result = json.load(file)
+        
+        skipTo = 3883
+        for index, link in enumerate(tqdm(self.result, desc='Cawlering', unit='page')):
+            if index < skipTo:
+                continue
 
-        for link in tqdm(self.result, desc='Cawlering', unit='page'):
-            self.driver.get(link['link'])
-            time.sleep(1)
+            try :
+                self.driver.get(link['link'])
+                time.sleep(random.uniform(2.0, 5.0))
 
-            mainContent = self.driver.find_element(By.CLASS_NAME, 'ts-section')
-            pTabs = mainContent.find_elements(By.TAG_NAME,'P')
+                mainContent = self.driver.find_element(By.CLASS_NAME, 'ts-section')
+                pTabs = mainContent.find_elements(By.TAG_NAME,'P')
 
-            content = ''
-            for p in pTabs:
-                content+=p.text + ' '
+                content = ''
+                for p in pTabs:
+                    content+=p.text + ' '
 
-            pageResult = {
-                'title': link['title'],
-                'content': content,
-                'category': link['type'],
-                'link': link['link']
-            }
-
+                pageResult = {
+                    'title': link['title'],
+                    'content': content,
+                    'category': link['type'],
+                    'link': link['link']
+                }
+            except Exception as e:
+                with open('./error-theStandard', 'a', encoding='utf-8') as file:
+                    file.write('\n Error at index ' + str(index) + ' ' + link['link'])
+                    file.write('\n' + str(e) + '\n')
+                continue
+                            
             file_path = './newsData/theStandard.json'
             if os.path.exists(file_path):
                 with open(file_path, 'r', encoding='utf-8') as file:

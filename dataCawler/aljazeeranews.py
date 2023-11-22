@@ -17,7 +17,7 @@ class aljazeeranews:
         chrome_options = Options()
         chrome_options.add_experimental_option('detach', True)
         chrome_options.add_argument("--log-level=3")
-        chrome_options.add_argument("--headless")
+        #chrome_options.add_argument("--headless")
         service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
         
@@ -86,19 +86,19 @@ class aljazeeranews:
 
     def _cawlerPerPage(self):
         if self.useJSON:
-            with open('./linkData/links-aljazeeranews.json', 'r', encoding='utf-8') as file:
+            with open('./linkData/links-aljazeeray.json', 'r', encoding='utf-8') as file:
                 self.result = json.load(file)
 
         for item in tqdm(self.result, desc='Cawlering', unit='page'):
             self._getArticleContent(item)
 
     def _getArticleContent(self, link_data):
-        self.driver.get(link_data['link'])
-        time.sleep(2)
-
         try:
-            content_area = self.driver.find_element(By.CSS_SELECTOR, 'main#main-content-area')
-            paragraphs = content_area.find_elements(By.CSS_SELECTOR, 'p')
+            self.driver.get(link_data['link'])
+            time.sleep(random.uniform(2.0, 5.0))
+
+            content_area = self.driver.find_element(By.CLASS_NAME, 'wysiwyg--all-content')
+            paragraphs = content_area.find_elements(By.TAG_NAME, 'p')
             content = ' '.join([p.text for p in paragraphs if p.text])
 
             pageResult = {
@@ -117,8 +117,10 @@ class aljazeeranews:
             data.append(pageResult)
             with open(file_path, 'w', encoding='utf-8') as file:
                 json.dump(data, file, indent=4)
-        except:
-            pass
+        except Exception as e:
+            with open('./error-theStandard.txt', 'a', encoding='utf-8') as file:
+                file.write('\n Error at ' + link_data['link'])
+                file.write('\n' + str(e) + '\n')
 
     def _outputLinksToFile(self):
         with open('./linkData/links-aljazeeray.json', 'w', encoding='utf-8') as file:
