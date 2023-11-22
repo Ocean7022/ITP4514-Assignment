@@ -86,7 +86,7 @@ class theStandard:
             print(f'{len(secondbox)} {type} news items found')
             for data in tqdm(secondbox, desc='Saving', unit='item'):
                 self.result.append(
-                {
+                    {
                         'link': data.find_elements(By.TAG_NAME, 'a')[0].get_attribute('href'),      
                         'title': data.find_elements(By.TAG_NAME, 'h1')[0].text,
                         'type': type
