@@ -13,6 +13,7 @@ tfidf = TfidfVectorizer(
     stop_words=list(ENGLISH_STOP_WORDS.union(set(pd.read_csv(stopWordListPath)['stop_word']))),
     token_pattern=token_pattern
 )
+tfidf = TfidfVectorizer()
 vectorizerPath = './model/tfidf_vectorizer.joblib'
 
 # model
