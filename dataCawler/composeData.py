@@ -33,7 +33,7 @@ for data in tqdm(newData, desc="Cleaning", unit="item"):
     else:
         category_counts[category] = 1
 
-with open('../data/newsData.json', 'w', encoding = 'utf-8') as f:
+with open('../data/newsDataSet.json', 'w', encoding = 'utf-8') as f:
     json.dump(newData, f, indent = 4)
 
 for category, count in category_counts.items():
