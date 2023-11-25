@@ -10,17 +10,12 @@ df = pd.read_json(config.dataSetPath)
 df["text"] = df["title"] + ". " + df["content"]
 print(len(df), 'data loaded from dataset')
 
-tfidf = TfidfVectorizer(
-    max_features=5000,
-    stop_words=list(ENGLISH_STOP_WORDS.union(set(pd.read_csv(config.stopWordListPath)['stop_word']))),
-    token_pattern=r'\b[a-zA-Z]{2,}\b'
-)  # 初始化TF-IDF向量化器，設置最大特徵數，停用詞和令牌模式
-
+tfidf = config.tfidf
 features_per_category = {}  # 創建一個空字典，用於存儲每個類別的特徵
 
 for category in tqdm(
     df["category"].unique(), desc="Calculating TF-IDF", unit=" category"
-):  # 對每個獨特的類別進行迴圈，並顯示進度條
+):
     category_docs = df[df["category"] == category]["text"]  # 從 DataFrame 中選取該類別的所有文檔
     tfidf_matrix = tfidf.fit_transform(category_docs)  # 對這些文檔應用 TF-IDF 轉換
     mean_scores = np.mean(tfidf_matrix, axis=0).A1  # 計算每個特徵的平均 TF-IDF 分數
