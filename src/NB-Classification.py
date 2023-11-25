@@ -1,8 +1,13 @@
 from joblib import load
 import config.Config as config
 
+print('Loading model...')
 model = load(config.nb_classificationModelPath)
+print('Model loaded successfully!')
+print('Loading vectorizer...')
 tfidf = load(config.vectorizerPath)
+print('Vectorizer loaded successfully!')
+
 
 with open('../data/testData/Test01-sport.txt', 'r') as f:
     testData = f.read()
