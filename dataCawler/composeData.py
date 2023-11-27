@@ -29,7 +29,7 @@ with open('./newsData/nbcnewsData.json', 'r') as f:
 with open('./newsData/theStandard.json', 'r') as f:
     theStandardData = json.load(f)
 
-cutFile('./newsData/aljazeerayData.json')
+#cutFile('./newsData/aljazeerayData.json')
 aljazeerayData = []
 for i in range(3):
     with open(f'./newsData/aljazeerayData-part{i + 1}.json', 'r') as f:
