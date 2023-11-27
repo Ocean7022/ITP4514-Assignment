@@ -1,8 +1,17 @@
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
 
-# classifier
-dataSetPath = '../data/newsDataSet.json'
+# read data set
+def readDataSet():
+    print('Reading data set...')
+    newsDataSet = []
+    for i in range(4):
+        with open(f'../data/newsDataSet-part{i + 1}.json', 'r') as f:
+            newsDataSet.append(pd.read_json(f))
+    combined_data = pd.concat(newsDataSet, ignore_index=True)
+    print('Data set length:', len(combined_data))
+    return combined_data
+        
 
 #tfidf
 stopWordListPath = '../data/stopWordList.csv'
