@@ -14,12 +14,12 @@ print(len(df), 'data loaded from dataset')
 
 # Vectorize news data
 tfidf = config.tfidf
-print('\nVectorizing...')
+print('Vectorizing...')
 X = tfidf.fit_transform(df['text'])
 print('Vectorized')
 
 # Save vectorizer
-print('\nSaving vectorizer...')
+print('Saving vectorizer...')
 dump(tfidf, config.vectorizerPath)
 print('Vectorizer saved')
 
@@ -28,12 +28,12 @@ y = df['category']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=40)
 
 model = MultinomialNB()
-print('\nTraining model...')
+print('Training model...')
 model.fit(X_train, y_train)
 print('Model trained')
 
 # Save model
-print('\nSaving model...')
+print('Saving model...')
 dump(model, config.nb_classificationModelPath)
 print('Model saved')
 

@@ -13,7 +13,7 @@ with open('../data/testData/Test01-sport.txt', 'r') as f:
     testData = f.read()
 X = tfidf.transform([testData])
 
-print('Result is:', model.predict(X))
+print('\nResult is:', model.predict(X))
 
 y_prob = model.predict_proba(X)
 

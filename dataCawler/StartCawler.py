@@ -1,10 +1,9 @@
-import nbcnews, theStandard, aljazeeranews, cnnnews
+import nbcnews, theStandard, aljazeeranews
 
 cawlers = [
-    #nbcnews.nbcnews(useJSON = False, onlyGetLinks = False),
-    #theStandard.theStandard(useJSON = True, onlyGetLinks = False),
-    #aljazeeranews.aljazeeranews(useJSON = True, onlyGetLinks = False),
-    cnnnews.cnnnews(useJSON = False, onlyGetLinks = True)
+    nbcnews.nbcnews(useJSON = False, onlyGetLinks = False),
+    theStandard.theStandard(useJSON = True, onlyGetLinks = False),
+    aljazeeranews.aljazeeranews(useJSON = True, onlyGetLinks = False)
 ]
 
 for cawler in cawlers:
