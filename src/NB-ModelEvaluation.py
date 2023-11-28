@@ -3,12 +3,15 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 import config.Config as config
 from joblib import dump
+import pandas as pd
 import time
 
 save = True
 
-df = config.readDataSet()
+print('Loading dataset...')
+df = pd.read_json(config.dataSetPath)
 df["text"] = df["title"] + ". " + df["content"]
+print(len(df), 'data loaded from dataset')
 
 # Vectorize news data
 tfidf = config.tfidf

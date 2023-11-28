@@ -1,9 +1,12 @@
 import numpy as np
 from tqdm import tqdm
+import pandas as pd
 import config.Config as config
 
-df = config.readDataSet()
+print('Loading dataset...')
+df = pd.read_json(config.dataSetPath)
 df["text"] = df["title"] + ". " + df["content"]
+print(len(df), 'data loaded from dataset')
 
 tfidf = config.tfidf
 features_per_category = {}
