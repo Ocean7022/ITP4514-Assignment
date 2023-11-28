@@ -21,3 +21,19 @@ vectorizerPath = './model/tfidf_vectorizer.joblib'
 
 # NB model
 nb_classificationModelPath = './model/NB-Model.joblib'
+
+
+
+# RNN model
+max_length = 300
+
+vocab_size = 7000
+embedding_dim = 150
+
+input_size = embedding_dim
+hidden_size = 256
+num_layers = 4
+
+learning_rate = 0.001
+num_epochs = 20
+
