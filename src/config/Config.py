@@ -12,7 +12,6 @@ def readDataSet():
     print('Data set length:', len(combined_data))
     return combined_data
         
-
 #tfidf
 stopWordListPath = '../data/stopWordList.csv'
 tfidf = TfidfVectorizer(
