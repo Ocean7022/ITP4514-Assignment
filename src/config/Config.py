@@ -16,10 +16,14 @@ def readDataSet():
 #tfidf
 stopWordListPath = '../data/stopWordList.csv'
 tfidf = TfidfVectorizer(
-    max_features=5000,
-    ngram_range=(1, 2),
+    max_features=8000,
+    ngram_range=(1, 3),
     stop_words=list(ENGLISH_STOP_WORDS.union(set(pd.read_csv(stopWordListPath)['stop_word']))),
-    token_pattern=r'\b[a-zA-Z]{2,}\b'
+    token_pattern=r'\b[a-zA-Z]{2,}\b',
+    max_df=0.5,
+    min_df=3,
+    norm='l2',
+    sublinear_tf=True
 )
 #tfidf = TfidfVectorizer()
 vectorizerPath = './model/tfidf_vectorizer.joblib'
