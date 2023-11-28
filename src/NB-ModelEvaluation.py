@@ -3,8 +3,9 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 import config.Config as config
 from joblib import dump
-import matplotlib.pyplot as plt
-import seaborn as sns
+import time
+
+save = True
 
 df = config.readDataSet()
 df["text"] = df["title"] + ". " + df["content"]
@@ -12,13 +13,16 @@ df["text"] = df["title"] + ". " + df["content"]
 # Vectorize news data
 tfidf = config.tfidf
 print('Vectorizing...')
+startTime = time.time()
 X = tfidf.fit_transform(df['text'])
-print('Vectorized')
+endTime = time.time()
+print('Vectorized', len(df), 'news in', endTime - startTime, 'seconds')
 
-# Save vectorizer
-print('Saving vectorizer...')
-dump(tfidf, config.vectorizerPath)
-print('Vectorizer saved')
+if save:
+    # Save vectorizer
+    print('Saving vectorizer...')
+    dump(tfidf, config.vectorizerPath)
+    print('Vectorizer saved')
 
 y = df['category']
 # split data into training and test sets
@@ -29,10 +33,11 @@ print('Training model...')
 model.fit(X_train, y_train)
 print('Model trained')
 
-# Save model
-print('Saving model...')
-dump(model, config.nb_classificationModelPath)
-print('Model saved')
+if save:
+    # Save model
+    print('Saving model...')
+    dump(model, config.nb_classificationModelPath)
+    print('Model saved')
 
 # make predictions for test data
 y_pred = model.predict(X_test)
