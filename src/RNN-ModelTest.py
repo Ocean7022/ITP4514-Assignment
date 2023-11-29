@@ -1,17 +1,18 @@
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader, random_split
-from sklearn.preprocessing import LabelEncoder
 import json
 import config.Config as config
+import nltk, string, os, re
+import matplotlib.pyplot as plt
+import seaborn as sns
+from torch.utils.data import Dataset, DataLoader, random_split
+from torch.nn.utils.rnn import pad_sequence
+from sklearn.preprocessing import LabelEncoder
 from tqdm import tqdm
 from collections import Counter
-from nltk.tokenize import word_tokenize
-from torch.nn.utils.rnn import pad_sequence
-import nltk
-import string, os, re
-from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem import PorterStemmer
 
 class NewsDataset(Dataset):
@@ -39,7 +40,8 @@ class RNN(nn.Module):
         out = out[:, -1, :]
         out = self.fc(out)
         return out
-    
+
+vocab = {}
 # get dataSet
 def dataPorcess():
     if os.path.exists(config.RNNDataSetPath):
@@ -56,27 +58,28 @@ def dataPorcess():
 
         texts = [item['title'] + '. ' + item['content'] for item in data]
         labels = [item['category'] for item in data]
+        texts, labels = cleanToShortData(texts, labels, 20)
         label_encoder = LabelEncoder()
         labels = label_encoder.fit_transform(labels)
 
         translator = str.maketrans('', '', string.punctuation)
-        texts = [text.translate(translator) for text in tqdm(texts, desc='Removing Punctuations', ncols=100, unit='item')]
+        texts = [text.translate(translator) for text in tqdm(texts, desc='Removing Punctuations', ncols=100)]
 
-        texts = [word_tokenize(text.lower()) for text in tqdm(texts, desc='Tokenizing', ncols=100, unit='item')]
+        texts = [word_tokenize(text.lower()) for text in tqdm(texts, desc='Tokenizing', ncols=100)]
 
+        pattern = re.compile(config.pattern)
+        texts = [[word for word in text if pattern.match(word)] for text in tqdm(texts, desc='Removing Non-English Words', ncols=100)]
 
-        #pattern = re.compile(config.pattern)
-        #texts = [[word for word in text if pattern.match(word)] for text in tqdm(texts, desc='Removing Non-English Words', ncols=100, unit='item')]
+        texts = [[word for word in text if word not in config.stopWordList] for text in tqdm(texts, desc='Removing Stopwords', ncols=100)]
 
-        #texts = [[word for word in text if word not in config.stopWordList] for text in tqdm(texts, desc='Removing Stopwords', ncols=100, unit='item')]
+        stemmer = PorterStemmer()
+        texts = [[stemmer.stem(word) for word in text] for text in tqdm(texts, desc='Stemming', ncols=100)]
+             
+        #countAvgLength(texts)
 
-        #stemmer = PorterStemmer()
-        #texts = [[stemmer.stem(word) for word in text] for text in tqdm(texts, desc='Stemming', ncols=100, unit='item')]
-
-        all_words = [word for text in texts for word in text]
-        word_freq = Counter(all_words)
-        vocab = {"UNK": 0}
-        vocab.update({word: idx + 1 for idx, (word, _) in enumerate(word_freq.items())})
+        word_freq = Counter(word for sentence in tqdm(texts, desc='Processing Texts', ncols=100) for word in sentence)
+        vocab = [word for word, freq in tqdm(word_freq.most_common(config.vocab_size - 1), desc='Creating Vocabulary', ncols=100)]
+        vocab.append("UNK")
 
         word_to_index = {word: index for index, word in enumerate(vocab)}
         texts = [[word_to_index.get(word, word_to_index["UNK"]) for word in text] for text in tqdm(texts, desc='Converting to Sequences', ncols=100)]
@@ -86,10 +89,24 @@ def dataPorcess():
         dataset = NewsDataset(padded_sequences, torch.tensor(labels))
         torch.save(dataset, config.RNNDataSetPath)
         return getTrainAndTestLoder(dataset)
-    
+
+def cleanToShortData(texts, labels, minSentenceLength = 20):
+    newTexts = []
+    newLabels = []
+    for label, text in tqdm(zip(labels, texts), desc='Removing too short data', ncols=100):
+        if len(sent_tokenize(text)) > minSentenceLength:
+            newTexts.append(text)
+            newLabels.append(label)
+    print('Removed', len(texts) - len(newTexts), 'too short data')
+    print('New DataSet Size:', len(newTexts))
+    print('New Labels Size:', len(newLabels))
+    return newTexts, newLabels
+
 def getTrainAndTestLoder(dataset):
-    train_size = int(config.train_ratio * len(dataset))
-    test_size = int((1 - config.train_ratio) * len(dataset))
+    total_size = len(dataset)
+    train_size = int(total_size * 0.8)
+    test_size = total_size - train_size
+
     train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
 
     train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
@@ -106,13 +123,26 @@ def getDevice():
         return torch.device('cpu')
 
 def countAvgLength(texts):
-    total = 0
-    for text in texts:
-        total += len(text)
-    return total / len(texts)
+    text_lengths = [len(text) for text in texts]
+    sortedText = sorted(text_lengths)
+    print('Top 10 Text Lengths:', sortedText[-10:])
+    print('Bottom 10 Text Lengths:', sortedText[:10])
+    print('Avg:', int(sum(text_lengths) / len(text_lengths)))
+    print('75%:', int(np.percentile(text_lengths, 75)))
+    print('90%:', int(np.percentile(text_lengths, 90)))
+    print('95%:', int(np.percentile(text_lengths, 95)))
 
-device = getDevice()
+    sns.set(style='whitegrid')
+    plt.figure(figsize=(12, 6))
+    sns.histplot(text_lengths, bins=50, kde=True)
+
+    plt.title('Text Length Distribution')
+    plt.xlabel('Text Length')
+    plt.ylabel('Frequency')
+    plt.savefig('textsLengthDistribution.png')
+
 train_loader, test_loader = dataPorcess()
+device = getDevice()
 model = RNN(config.input_size, config.hidden_size, config.num_layers, config.num_classes).to(device)
 
 num_samples_class = [1888, 17497, 1020, 623, 2134, 565, 1184, 693, 16004]
