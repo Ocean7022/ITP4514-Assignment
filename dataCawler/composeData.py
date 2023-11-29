@@ -1,8 +1,8 @@
-import json, os
+import json
 from tqdm import tqdm
 
 def remove_special_characters(input_string):
-    special_chars = ['\u00ad', '\u2018', '\u2019', '\u201c', '\u201d', '\u00AD', '\n', '\t', '\r', '\f']
+    special_chars = ['\u2013', '\u2014', '\u00ad', '\u2018', '\u2019', '\u201c', '\u201d', '\u00AD', '\n', '\t', '\r', '\f']
     for char in special_chars:
         input_string = input_string.replace(char, "")
     return input_string
@@ -27,7 +27,7 @@ print('CNN:', len(cnnnewsData))
 newData = nbcnewsData + theStandardData + aljazeerayData + cnnnewsData
 category_counts = {}
 
-for data in tqdm(newData, desc="Cleaning", unit="item", ncols=80):
+for data in tqdm(newData, desc = "Cleaning", unit = "item", ncols = 100):
     data['title'] = remove_special_characters(data['title'])
     data['content'] = remove_special_characters(data['content'])
 
