@@ -10,19 +10,51 @@ from collections import Counter
 from nltk.tokenize import word_tokenize
 from torch.nn.utils.rnn import pad_sequence
 import nltk
-import string
+import string, os, re
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
-# 加载数据集
-with open(config.dataSetPath, 'r', encoding='utf-8') as file:
-    data = json.load(file)
+# get dataSet
+def dataPorcess():
+    if os.path.exists(config.RNNDataSetPath):
+        print('Processed DataSet already exists.')
+        return torch.load(config.RNNDataSetPath)
+    else:
+        print('Processed DataSet does not exist, start processing...')
+        print('Reading DataSet...')
+        with open(config.dataSetPath, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        print('DataSet read successfully.', len(data), 'items in total.')
 
-# 提取文本和标签
-texts = [item['title'] + '. ' + item['content'] for item in data]
-labels = [item['category'] for item in data]
+        nltk.download('punkt')
 
-# 下载停用词
+        texts = [item['title'] + '. ' + item['content'] for item in data]
+        labels = [item['category'] for item in data]
+
+        translator = str.maketrans('', '', string.punctuation)
+        texts = [text.translate(translator) for text in tqdm(texts, desc='Removing Punctuations', ncols=100, unit='item')]
+
+        texts = [word_tokenize(text.lower()) for text in tqdm(texts, desc='Tokenizing', ncols=100, unit='item')]
+
+        pattern = re.compile(config.pattern)
+        texts = [[word for word in text if pattern.match(word)] for text in tqdm(texts, desc='Removing Non-English Words', ncols=100, unit='item')]
+
+        texts = [[word for word in text if word not in config.stopWordList] for text in tqdm(texts, desc='Removing Stopwords', ncols=100, unit='item')]
+
+        stemmer = PorterStemmer()
+        texts = [[stemmer.stem(word) for word in text] for text in tqdm(texts, desc='Stemming', ncols=100, unit='item')]
+
+        #print(texts[2], '\n', len(texts[2]))
+        #print(labels[2], len(labels), len(texts))
+
+        all_words = [word for text in texts for word in text]
+        word_freq = Counter(all_words)
+        vocab = {word: idx for idx, (word, _) in enumerate(word_freq.items())}
+        print("Vocabulary size:", len(vocab))
+    
+dataPorcess()
+exit(0)
+
 nltk.download('stopwords')
 stop_words = set(stopwords.words('english'))
 

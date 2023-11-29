@@ -25,6 +25,10 @@ nb_classificationModelPath = './model/NB-Model.joblib'
 
 
 # RNN model
+RNNDataSetPath = '../data/RNNDataSet.pth'
+stopWordList = ENGLISH_STOP_WORDS.union(set(pd.read_csv(stopWordListPath)['stop_word']))
+pattern = r'\b[a-zA-Z]{3,}\b'
+
 max_length = 300
 
 vocab_size = 7000
