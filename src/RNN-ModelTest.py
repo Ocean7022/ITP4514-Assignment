@@ -41,14 +41,13 @@ class RNN(nn.Module):
         out = self.fc(out)
         return out
 
-vocab = {}
 # get dataSet
 def dataPorcess():
     if os.path.exists(config.RNNDataSetPath):
-        print('Processed DataSet already exists.')
+        print('\nProcessed DataSet already exists.')
         return getTrainAndTestLoder(torch.load(config.RNNDataSetPath))
     else:
-        print('Processed DataSet does not exist, start processing...')
+        print('\nProcessed DataSet does not exist, start processing...')
         print('Reading DataSet...')
         with open(config.dataSetPath, 'r', encoding='utf-8') as file:
             data = json.load(file)
@@ -75,11 +74,12 @@ def dataPorcess():
         stemmer = PorterStemmer()
         texts = [[stemmer.stem(word) for word in text] for text in tqdm(texts, desc='Stemming', ncols=100)]
              
-        #countAvgLength(texts)
+        countAvgLength(texts)
 
         word_freq = Counter(word for sentence in tqdm(texts, desc='Processing Texts', ncols=100) for word in sentence)
         vocab = [word for word, freq in tqdm(word_freq.most_common(config.vocab_size - 1), desc='Creating Vocabulary', ncols=100)]
         vocab.append("UNK")
+        print('Vocabulary Size:', len(vocab))
 
         word_to_index = {word: index for index, word in enumerate(vocab)}
         texts = [[word_to_index.get(word, word_to_index["UNK"]) for word in text] for text in tqdm(texts, desc='Converting to Sequences', ncols=100)]
@@ -104,15 +104,11 @@ def cleanToShortData(texts, labels, minSentenceLength = 20):
 
 def getTrainAndTestLoder(dataset):
     total_size = len(dataset)
-    train_size = int(total_size * 0.8)
+    train_size = int(total_size * config.train_ratio)
     test_size = total_size - train_size
 
     train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
-
-    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
-
-    return train_loader, test_loader
+    return dataSetSort(train_dataset), test_dataset
 
 def getDevice():
     if torch.cuda.is_available():
@@ -141,15 +137,35 @@ def countAvgLength(texts):
     plt.ylabel('Frequency')
     plt.savefig('textsLengthDistribution.png')
 
-train_loader, test_loader = dataPorcess()
+def dataSetSort(dataSet):
+    texts = [dataSet[i][0] for i in range(len(dataSet))]
+    labels = [dataSet[i][1] for i in range(len(dataSet))]
+
+    combined = list(zip(texts, labels))
+    sorted_combined = sorted(combined, key=lambda x: x[1])
+    sorted_texts, sorted_labels = zip(*sorted_combined)
+
+    return NewsDataset(list(sorted_texts), list(sorted_labels))
+
+def countClassWeights(dataset):
+    labels = [dataset[i][1].item() for i in range(len(dataset))]
+    label_counts = Counter(labels)
+    num_samples_class = [label_counts[i] for i in range(config.num_classes)]
+    weights = [1 - (x / sum(num_samples_class)) for x in num_samples_class]
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+    print('Weights:', normalized_weights)
+    return torch.tensor(normalized_weights, dtype=torch.float)
+
+train_dataset, test_dataset = dataPorcess()
+train_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=config.batch_size, shuffle=False)
+
 device = getDevice()
 model = RNN(config.input_size, config.hidden_size, config.num_layers, config.num_classes).to(device)
+class_weights = countClassWeights(train_dataset).to(device)
+criterion = nn.CrossEntropyLoss(weight=class_weights).to(device)
 
-num_samples_class = [1888, 17497, 1020, 623, 2134, 565, 1184, 693, 16004]
-weights = [1 - (x / 41608) for x in num_samples_class]
-class_weights = torch.tensor(weights, dtype=torch.float).to(device)
-#criterion = nn.CrossEntropyLoss(weight=class_weights).to(device)
-criterion = nn.CrossEntropyLoss().to(device)
 optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
 
 embedding = nn.Embedding(config.vocab_size, config.embedding_dim).to(device)
@@ -196,15 +212,15 @@ for epoch in range(config.num_epochs):
     val_accuracy = 100 * correct_predictions / total_predictions
     print(f'Epoch [{epoch+1}/{config.num_epochs}], Validation Loss: {avg_val_loss:.4f}, Test Accuracy: {val_accuracy:.2f}%')
 
-    if avg_val_loss < best_val_loss:
-        best_val_loss = avg_val_loss
-        patience_counter = 0
-        #torch.save(model.state_dict(), 'best_model.pth')
-    else:
-        patience_counter += 1
-        if patience_counter >= patience:
-            print('Early stopping triggered')
-            break
+    #if avg_val_loss < best_val_loss:
+    #    best_val_loss = avg_val_loss
+    #    patience_counter = 0
+    #    #torch.save(model.state_dict(), 'best_model.pth')
+    #else:
+    #    patience_counter += 1
+    #    if patience_counter >= patience:
+    #        print('Early stopping triggered')
+    #        break
 print('Finished Training')
 
 print('Start testing...')
@@ -223,4 +239,4 @@ with torch.no_grad():
         correct += (predicted == labels).sum().item()
 
     print('Test Accuracy: {} %'.format(100 * correct / total))
-print('Finished Testing')
+print('Finished Testing\n')
