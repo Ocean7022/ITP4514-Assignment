@@ -39,9 +39,9 @@ max_length = 900
 vocab_size = 13000
 embedding_dim = 500
 input_size = embedding_dim
-hidden_size = 128
-num_layers = 3
+hidden_size = 512
+num_layers = 6
 num_classes = 9 # num of types of news
-learning_rate = 0.001
+learning_rate = 0.01
 num_epochs = 10
 
