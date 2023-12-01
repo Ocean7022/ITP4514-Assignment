@@ -15,6 +15,8 @@ from collections import Counter
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem import PorterStemmer
 
+# News classification model 
+
 class NewsDataset(Dataset):
     def __init__(self, texts, labels):
         self.texts = texts
@@ -43,9 +45,9 @@ class GRUModel(nn.Module):
 
 # get dataSet
 def dataPorcess():
-    if os.path.exists(config.RNNDataSetPath):
+    if os.path.exists(config.GRUDataSetPath):
         print('\nProcessed DataSet already exists.')
-        return getTrainAndTestLoder(torch.load(config.RNNDataSetPath))
+        return getTrainAndTestLoder(torch.load(config.GRUDataSetPath))
     else:
         print('\nProcessed DataSet does not exist, start processing...')
         print('Reading DataSet...')
@@ -89,7 +91,7 @@ def dataPorcess():
         padded_sequences = pad_sequence([torch.tensor(seq[:config.max_length]) for seq in tqdm(texts, desc='Padding Sequences', ncols=100)], batch_first=True)
         
         dataset = NewsDataset(padded_sequences, torch.tensor(labels))
-        torch.save(dataset, config.RNNDataSetPath)
+        torch.save(dataset, config.GRUDataSetPath)
         return getTrainAndTestLoder(dataset)
 
 def cleanToShortData(texts, labels, minSentenceLength = 10):
@@ -221,7 +223,7 @@ for epoch in range(config.num_epochs):
     if avg_val_loss < best_val_loss:
         best_val_loss = avg_val_loss
         patience_counter = 0
-        #torch.save(model.state_dict(), 'best_model.pth')
+        torch.save(model.state_dict(), config.GRU_classificationModelPath)
     else:
         patience_counter += 1
         if patience_counter >= patience:

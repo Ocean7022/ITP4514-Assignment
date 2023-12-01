@@ -19,18 +19,18 @@ tfidf = TfidfVectorizer(
 #tfidf = TfidfVectorizer()
 vectorizerPath = './model/tfidf_vectorizer.joblib'
 # NB model
-nb_classificationModelPath = './model/NB-Model.joblib'
+nb_classificationModelPath = './model/NB-ClassificationModel.joblib'
 
 
 
 # GUR model
-dataSetPath01 = '../data/RNNDataSet01.pth'
-RNNDataSetPath = dataSetPath01
+GRUDataSetPath = '../data/GRUDataSet.pth'
+GRU_classificationModelPath = './model/GRU-ClassificationModel.pth'
 
 stopWordList = ENGLISH_STOP_WORDS.union(set(pd.read_csv(stopWordListPath)['stop_word']))
 pattern = r'\b[a-zA-Z]{3,}\b'
 
-batch_size = 256
+batch_size = 128
 train_ratio = 0.8
 
 max_length = 1000
