@@ -26,17 +26,17 @@ class NewsDataset(Dataset):
     def __getitem__(self, idx):
         return self.texts[idx], self.labels[idx]
     
-class RNN(nn.Module):
+class GRUModel(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, num_classes):
-        super(RNN, self).__init__()
+        super(GRUModel, self).__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
-        self.rnn = nn.RNN(input_size, hidden_size, num_layers, batch_first=True)
+        self.gru = nn.GRU(input_size, hidden_size, num_layers, batch_first=True)
         self.fc = nn.Linear(hidden_size, num_classes)
     
     def forward(self, x):
         h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
-        out, _ = self.rnn(x, h0)
+        out, _ = self.gru(x, h0)
         out = out[:, -1, :]
         out = self.fc(out)
         return out
@@ -57,7 +57,7 @@ def dataPorcess():
 
         texts = [item['title'] + '. ' + item['content'] for item in data]
         labels = [item['category'] for item in data]
-        texts, labels = cleanToShortData(texts, labels, 10)
+        texts, labels = cleanToShortData(texts, labels)
         label_encoder = LabelEncoder()
         labels = label_encoder.fit_transform(labels)
 
@@ -74,10 +74,10 @@ def dataPorcess():
         stemmer = PorterStemmer()
         texts = [[stemmer.stem(word) for word in text] for text in tqdm(texts, desc='Stemming', ncols=100)]
              
-        countAvgLength(texts)
+        #countAvgLength(texts)
 
         word_freq = Counter(word for sentence in tqdm(texts, desc='Processing Texts', ncols=100) for word in sentence)
-        vocab = [word for word, freq in tqdm(word_freq.most_common(config.vocab_size - 1), desc='Creating Vocabulary', ncols=100)]
+        #vocab = [word for word, freq in tqdm(word_freq.most_common(config.vocab_size - 1), desc='Creating Vocabulary', ncols=100)]
         vocab = [word for word, freq in tqdm(word_freq.most_common(len(word_freq) - 1), desc='Creating Vocabulary', ncols=100)]
         vocab.append("UNK")
         config.vocab_size = len(vocab)
@@ -92,7 +92,7 @@ def dataPorcess():
         torch.save(dataset, config.RNNDataSetPath)
         return getTrainAndTestLoder(dataset)
 
-def cleanToShortData(texts, labels, minSentenceLength = 20):
+def cleanToShortData(texts, labels, minSentenceLength = 10):
     newTexts = []
     newLabels = []
     for label, text in tqdm(zip(labels, texts), desc='Removing too short data', ncols=100):
@@ -138,7 +138,7 @@ def countAvgLength(texts):
     plt.title('Text Length Distribution')
     plt.xlabel('Text Length')
     plt.ylabel('Frequency')
-    plt.savefig('textsLengthDistribution.png')
+    plt.savefig('../img/GUR-Tuning/textsLengthDistribution.png')
 
 def dataSetSort(dataSet):
     texts = [dataSet[i][0] for i in range(len(dataSet))]
@@ -165,9 +165,10 @@ train_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=T
 test_loader = DataLoader(test_dataset, batch_size=config.batch_size, shuffle=False)
 
 device = getDevice()
-model = RNN(config.input_size, config.hidden_size, config.num_layers, config.num_classes).to(device)
+model = GRUModel(config.input_size, config.hidden_size, config.num_layers, config.num_classes).to(device)
 class_weights = countClassWeights(train_dataset).to(device)
-criterion = nn.CrossEntropyLoss(weight=class_weights).to(device)
+#criterion = nn.CrossEntropyLoss(weight=class_weights).to(device)
+criterion = nn.CrossEntropyLoss().to(device)
 
 optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
 
@@ -217,15 +218,15 @@ for epoch in range(config.num_epochs):
     val_accuracy = 100 * correct_predictions / total_predictions
     print(f'Epoch [{epoch+1}/{config.num_epochs}], Validation Loss: {avg_val_loss:.4f}, Test Accuracy: {val_accuracy:.2f}%')
 
-    #if avg_val_loss < best_val_loss:
-    #    best_val_loss = avg_val_loss
-    #    patience_counter = 0
-    #    #torch.save(model.state_dict(), 'best_model.pth')
-    #else:
-    #    patience_counter += 1
-    #    if patience_counter >= patience:
-    #        print('Early stopping triggered')
-    #        break
+    if avg_val_loss < best_val_loss:
+        best_val_loss = avg_val_loss
+        patience_counter = 0
+        #torch.save(model.state_dict(), 'best_model.pth')
+    else:
+        patience_counter += 1
+        if patience_counter >= patience:
+            print('Early stopping triggered')
+            break
 print('Finished Training')
 
 print('Start testing...')
