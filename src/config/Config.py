@@ -33,13 +33,13 @@ pattern = r'\b[a-zA-Z]{3,}\b'
 batch_size = 128
 train_ratio = 0.8
 
-max_length = 1500
-vocab_size = 137112
-embedding_dim = 600
+max_length = 1200
+vocab_size = 14000
+embedding_dim = 400
 input_size = embedding_dim
 hidden_size = 128
-num_layers = 4
+num_layers = 3
 num_classes = 9 # num of types of news
-learning_rate = 0.001
-num_epochs = 10
+learning_rate = 0.002
+num_epochs = 20
 

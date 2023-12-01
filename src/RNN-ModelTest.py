@@ -77,8 +77,8 @@ def dataPorcess():
         #countAvgLength(texts)
 
         word_freq = Counter(word for sentence in tqdm(texts, desc='Processing Texts', ncols=100) for word in sentence)
-        #vocab = [word for word, freq in tqdm(word_freq.most_common(config.vocab_size - 1), desc='Creating Vocabulary', ncols=100)]
-        vocab = [word for word, freq in tqdm(word_freq.most_common(len(word_freq) - 1), desc='Creating Vocabulary', ncols=100)]
+        vocab = [word for word, freq in tqdm(word_freq.most_common(config.vocab_size - 1), desc='Creating Vocabulary', ncols=100)]
+        #vocab = [word for word, freq in tqdm(word_freq.most_common(len(word_freq) - 1), desc='Creating Vocabulary', ncols=100)]
         vocab.append("UNK")
         config.vocab_size = len(vocab)
         print('Vocabulary Size:', len(vocab))
@@ -167,8 +167,8 @@ test_loader = DataLoader(test_dataset, batch_size=config.batch_size, shuffle=Fal
 device = getDevice()
 model = GRUModel(config.input_size, config.hidden_size, config.num_layers, config.num_classes).to(device)
 class_weights = countClassWeights(train_dataset).to(device)
-#criterion = nn.CrossEntropyLoss(weight=class_weights).to(device)
-criterion = nn.CrossEntropyLoss().to(device)
+criterion = nn.CrossEntropyLoss(weight=class_weights).to(device)
+#criterion = nn.CrossEntropyLoss().to(device)
 
 optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
 
