@@ -57,7 +57,7 @@ def dataPorcess():
 
         texts = [item['title'] + '. ' + item['content'] for item in data]
         labels = [item['category'] for item in data]
-        texts, labels = cleanToShortData(texts, labels, 20)
+        texts, labels = cleanToShortData(texts, labels, 10)
         label_encoder = LabelEncoder()
         labels = label_encoder.fit_transform(labels)
 
@@ -78,7 +78,9 @@ def dataPorcess():
 
         word_freq = Counter(word for sentence in tqdm(texts, desc='Processing Texts', ncols=100) for word in sentence)
         vocab = [word for word, freq in tqdm(word_freq.most_common(config.vocab_size - 1), desc='Creating Vocabulary', ncols=100)]
+        vocab = [word for word, freq in tqdm(word_freq.most_common(len(word_freq) - 1), desc='Creating Vocabulary', ncols=100)]
         vocab.append("UNK")
+        config.vocab_size = len(vocab)
         print('Vocabulary Size:', len(vocab))
 
         word_to_index = {word: index for index, word in enumerate(vocab)}
@@ -121,6 +123,7 @@ def getDevice():
 def countAvgLength(texts):
     text_lengths = [len(text) for text in texts]
     sortedText = sorted(text_lengths)
+    #print('Total Texts:', sortedText)
     print('Top 10 Text Lengths:', sortedText[-10:])
     print('Bottom 10 Text Lengths:', sortedText[:10])
     print('Avg:', int(sum(text_lengths) / len(text_lengths)))
@@ -169,6 +172,8 @@ criterion = nn.CrossEntropyLoss(weight=class_weights).to(device)
 optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
 
 embedding = nn.Embedding(config.vocab_size, config.embedding_dim).to(device)
+
+#exit(0)
 
 best_val_loss = float('inf')
 patience = 5

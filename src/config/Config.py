@@ -36,12 +36,12 @@ batch_size = 128
 train_ratio = 0.8
 
 max_length = 900
-vocab_size = 13000
-embedding_dim = 500
+vocab_size = 73000
+embedding_dim = 600
 input_size = embedding_dim
-hidden_size = 512
-num_layers = 6
+hidden_size = 128
+num_layers = 2
 num_classes = 9 # num of types of news
-learning_rate = 0.01
+learning_rate = 0.005
 num_epochs = 10
 
