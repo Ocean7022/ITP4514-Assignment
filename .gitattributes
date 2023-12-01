@@ -1,3 +1,4 @@
 newsDataSet.json filter=lfs diff=lfs merge=lfs -text
 aljazeerayData.json filter=lfs diff=lfs merge=lfs -text
 *.joblib filter=lfs diff=lfs merge=lfs -text
+*.pth filter=lfs diff=lfs merge=lfs -text
