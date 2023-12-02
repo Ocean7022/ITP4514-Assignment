@@ -1,6 +1,22 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+class_counts = [1888, 17497, 565, 623, 2134, 565, 1184, 693, 16004]
+class_labels = ['health', 'business', 'politics', 'culture', 'property', 'education', 'travel', 'technology', 'sport']
+
+sns.set(style='whitegrid')
+
+plt.figure(figsize=(11, 7))
+plt.subplots_adjust(bottom=0.1, top=0.94, left=0.08, right=0.98)
+sns.barplot(x=class_labels, y=class_counts)
+
+plt.title('Distribution of Classes')
+plt.xlabel('Type of News')
+plt.ylabel('Counts')
+
+plt.show()
+
+exit()
 
 categories = ['business', 'culture', 'education', 'health', 'politics', 'property', 'sport', 'technology', 'travel']
 precisions = [0.90, 0.90, 0.88, 0.83, 0.89, 0.78, 0.99, 0.86, 0.64]
@@ -25,25 +41,5 @@ ax.legend()
 plt.subplots_adjust(bottom=0.17, top=0.94, left=0.06, right=0.99)
 
 plt.show()
-exit()
 
 
-
-# Sample data
-class_counts = [1888, 17497, 565, 623, 2134, 565, 1184, 693, 16004]
-class_labels = ['health', 'business', 'politics', 'culture', 'property', 'education', 'travel', 'technology', 'sport']
-
-# Set the style
-sns.set(style='whitegrid')
-
-# Create a bar plot
-plt.figure(figsize=(10, 6))
-sns.barplot(x=class_labels, y=class_counts)
-
-# Adding title and labels
-plt.title('Distribution of Classes')
-plt.xlabel('Type of News')
-plt.ylabel('Counts')
-
-# Show the plot
-plt.show()
