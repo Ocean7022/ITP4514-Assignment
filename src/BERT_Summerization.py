@@ -1,4 +1,3 @@
-# 使用Transformers庫的BertTokenizer和BertModel
 from transformers import BertTokenizer, BertModel
 import torch
 import pandas as pd
@@ -28,13 +27,14 @@ encoding = tokenizer(sentences, padding=True, truncation=True, return_tensors='p
 input_ids = encoding['input_ids']
 attention_mask = encoding['attention_mask']
 
-# 檢查是否有可用的GPU
 is_cuda = torch.cuda.is_available()
-# 如果有GPU，將模型和數據轉移到GPU上
 if is_cuda:
     model = model.to('cuda')
     input_ids = input_ids.to('cuda')
     attention_mask = attention_mask.to('cuda')
+    print(f'Using GPU: {torch.cuda.get_device_name(torch.cuda.current_device())}')
+else:
+    print('Using CPU')
 
 # 禁用梯度計算，進行模型的前向傳播，獲取輸出
 with torch.no_grad():
