@@ -43,10 +43,10 @@ class GRUModel(nn.Module):
 
 class GRU_ModelTuning:
     def __init__(self):
-        if os.path.exists(config.GRUDataSetPath):
+        if os.path.exists(config.GRUProcessedDataSetPath):
             select = input('\nDo you want to delete old dataSet? (y/n): ')
             if select == 'y':
-                os.remove(config.GRUDataSetPath)
+                os.remove(config.GRUProcessedDataSetPath)
             elif select == 'n':
                 pass
             else:
@@ -54,16 +54,29 @@ class GRU_ModelTuning:
                 self.__init__()
 
         self.train_dataset, self.test_dataset = self.__dataPorcess()
+        texts = [self.train_dataset[i][0] for i in range(len(self.train_dataset))]
+        labels = [self.train_dataset[i][1] for i in range(len(self.train_dataset))]
+        print(labels[:10])
+
+        label_encoder = LabelEncoder()
+        labels = label_encoder.fit_transform(labels)
+        print(label_encoder.classes_)
+
+        self.train_dataset = NewsDataset(texts, torch.tensor(labels))
+        
+
         self.train_loader = DataLoader(self.train_dataset, batch_size=config.batch_size, shuffle=True)
         self.test_loader = DataLoader(self.test_dataset, batch_size=config.batch_size, shuffle=False)
 
         self.device = self.__getDevice()
         self.model = GRUModel(config.input_size, config.hidden_size, config.num_layers, config.num_classes).to(self.device)
         self.class_weights = self.__countClassWeights(self.train_dataset).to(self.device)
+        exit()
         self.criterion = nn.CrossEntropyLoss(weight=self.class_weights).to(self.device)
         #criterion = nn.CrossEntropyLoss().to(device)
         self.optimizer = optim.Adam(self.model.parameters(), lr=config.learning_rate)
         self.embedding = nn.Embedding(config.vocab_size, config.embedding_dim).to(self.device)
+        torch.save(self.model.state_dict(), config.GRUStareDictPath)
         self.__startTraining()
         self.__startTesting()
     
@@ -112,7 +125,7 @@ class GRU_ModelTuning:
             if avg_val_loss < best_val_loss:
                 best_val_loss = avg_val_loss
                 patience_counter = 0
-                torch.save(self.model.state_dict(), config.GRU_classificationModelPath)
+                torch.save(self.model.state_dict(), config.GRUClassificationModelPath)
             else:
                 patience_counter += 1
                 if patience_counter >= patience:
@@ -140,9 +153,9 @@ class GRU_ModelTuning:
         print('Finished Testing\n')
 
     def __dataPorcess(self):
-        if os.path.exists(config.GRUDataSetPath):
+        if os.path.exists(config.GRUProcessedDataSetPath):
             print('Processed DataSet already exists.')
-            return self.getTrainAndTestLoder(torch.load(config.GRUDataSetPath))
+            return self.__getTrainAndTestLoder(torch.load(config.GRUProcessedDataSetPath))
         else:
             print('Processed DataSet does not exist, start processing...')
             print('Reading DataSet...')
@@ -155,8 +168,11 @@ class GRU_ModelTuning:
             texts = [item['title'] + '. ' + item['content'] for item in data]
             labels = [item['category'] for item in data]
             texts, labels = self.__cleanToShortData(texts, labels)
-            label_encoder = LabelEncoder()
-            labels = label_encoder.fit_transform(labels)
+
+           # label_encoder = LabelEncoder()
+           # labels = label_encoder.fit_transform(labels)
+           # print(torch.tensor(labels))
+           # exit()
 
             translator = str.maketrans('', '', string.punctuation)
             texts = [text.translate(translator) for text in tqdm(texts, desc='Removing Punctuations', ncols=100)]
@@ -175,10 +191,11 @@ class GRU_ModelTuning:
 
             word_freq = Counter(word for sentence in tqdm(texts, desc='Processing Texts', ncols=100) for word in sentence)
             # customizing the vocabulary size
-            vocab = [word for word, freq in tqdm(word_freq.most_common(config.vocab_size - 1), desc='Creating Vocabulary', ncols=100)]
+            vocab = [word for word, freq in tqdm(word_freq.most_common(config.vocab_size - 2), desc='Creating Vocabulary', ncols=100)]
             # full size vocabulary
-            #vocab = [word for word, freq in tqdm(word_freq.most_common(len(word_freq) - 1), desc='Creating Vocabulary', ncols=100)]
+            #vocab = [word for word, freq in tqdm(word_freq.most_common(len(word_freq) - 2), desc='Creating Vocabulary', ncols=100)]
             vocab.append("UNK")
+            vocab.append("PAD")
             config.vocab_size = len(vocab)
             print('Vocabulary Size:', len(vocab))
 
@@ -188,11 +205,11 @@ class GRU_ModelTuning:
 
             padded_sequences = pad_sequence([torch.tensor(seq[:config.max_length]) for seq in tqdm(texts, desc='Padding Sequences', ncols=100)], batch_first=True)
             
-            dataset = NewsDataset(padded_sequences, torch.tensor(labels))
-            torch.save(dataset, config.GRUDataSetPath)
-            return self.getTrainAndTestLoder(dataset)
+            dataset = NewsDataset(padded_sequences, labels)
+            torch.save(dataset, config.GRUProcessedDataSetPath)
+            return self.__getTrainAndTestLoder(dataset)
 
-    def __cleanToShortData(self, texts, labels, minSentenceLength = 10):
+    def __cleanToShortData(self, texts, labels, minSentenceLength = 50):
         newTexts = []
         newLabels = []
         for label, text in tqdm(zip(labels, texts), desc='Removing too short data', ncols=100):
@@ -204,13 +221,13 @@ class GRU_ModelTuning:
         print('New Labels Size:', len(newLabels))
         return newTexts, newLabels
 
-    def getTrainAndTestLoder(self, dataset):
+    def __getTrainAndTestLoder(self, dataset):
         total_size = len(dataset)
         train_size = int(total_size * config.train_ratio)
         test_size = total_size - train_size
 
         train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
-        return self.__dataSetSort(train_dataset), test_dataset
+        return train_dataset, test_dataset
 
     def __getDevice(self):
         if torch.cuda.is_available():
@@ -248,6 +265,10 @@ class GRU_ModelTuning:
         sorted_combined = sorted(combined, key=lambda x: x[1])
         sorted_texts, sorted_labels = zip(*sorted_combined)
 
+        label_encoder = LabelEncoder()
+        sorted_labels = label_encoder.fit_transform(sorted_labels)
+        print(label_encoder.classes_)
+        exit()
         return NewsDataset(list(sorted_texts), list(sorted_labels))
 
     def __countClassWeights(self, dataset):
@@ -259,8 +280,3 @@ class GRU_ModelTuning:
         normalized_weights = [w / total_weight for w in weights]
         print('Weights:', normalized_weights)
         return torch.tensor(normalized_weights, dtype=torch.float)
-
-
-
-
-

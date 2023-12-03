@@ -1,13 +1,13 @@
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
 
+dataSetPath = '../data/newsDataSet.json'
 stopWordListPath = '../data/stopWordList.csv'
 testDataFolderPath = '../data/testData'
 
 # NB model
-dataSetPath = '../data/newsDataSet.json'
-vectorizerPath = './model/tfidf_vectorizer.joblib'
-nb_classificationModelPath = './model/NB-ClassificationModel.joblib'
+vectorizerPath = './model/NB/NB-TfidfVectorizer.joblib'
+nb_classificationModelPath = './model/NB/NB-ClassificationModel.joblib'
 resultPhotoPath = '../img/NB-Tuning/Result.png'
 tfidf = TfidfVectorizer(
     max_features=8000,
@@ -21,9 +21,11 @@ tfidf = TfidfVectorizer(
 )
 
 # GUR model
-GRUDataSetPath = '../data/GRUDataSet.pth'
-GRUWordToIndexPath = '../data/GRUWordToIndex.pth'
-GRU_classificationModelPath = './model/GRU-ClassificationModel.pth'
+GRUProcessedDataSetPath = './model/GRU/GRU-ProcessedDataSet.pth'
+GRUWordToIndexPath = './model/GRU/GRU-WordToIndex.pth'
+GRUClassificationModelPath = './model/GRU/GRU-ClassificationModel.pth'
+GRUStareDictPath = './model/GRU/GRU-StareDict.pth'
+GRULabelEncoderPath = './model/GRU/GRU-LabelEncoder.pth'
 
 stopWordList = ENGLISH_STOP_WORDS.union(set(pd.read_csv(stopWordListPath)['stop_word']))
 pattern = r'\b[a-zA-Z]{3,}\b'
