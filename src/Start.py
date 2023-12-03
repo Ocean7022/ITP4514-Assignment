@@ -31,7 +31,7 @@ class Start:
     def __nb(self):
         print('\n - Naive Bayes (NB) - ')
         print('[1] - Start Classification')
-        print('      Classify the new(s).')
+        print('      Classify the new.')
         print('[2] - Start Model Evaluation')
         print('      Train and test the model.')
         print('[3] - Start Feature Analysis') 
@@ -50,11 +50,27 @@ class Start:
         elif option == 'b':
             Start()
         else:
-            print('Invalid input, please try again.\n')
+            print('Invalid input, please try again.')
             self.__nb()
 
     def __gru(self):
-        pass
+        print('\n - Gated Recurrent Unit (GRU) - ')
+        print('[1] - Start Classification')
+        print('      Classify the new.')
+        print('[2] - Start Model Tuning')
+        print('      Tune and test the model.')
+        print('\n[b] - Back')
+        option = input('Select an option: ')
+        if option == '1':
+            pass
+        elif option == '2':
+            import GRU_ModelTuning as GRU
+            GRU.GRU_ModelTuning()
+        elif option == 'b':
+            Start()
+        else:
+            print('Invalid input, please try again.')
+            self.__gru()
 
     def __bert(self):
         pass
