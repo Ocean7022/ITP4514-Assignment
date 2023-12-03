@@ -22,6 +22,7 @@ tfidf = TfidfVectorizer(
 
 # GUR model
 GRUDataSetPath = '../data/GRUDataSet.pth'
+GRUWordToIndexPath = '../data/GRUWordToIndex.pth'
 GRU_classificationModelPath = './model/GRU-ClassificationModel.pth'
 
 stopWordList = ENGLISH_STOP_WORDS.union(set(pd.read_csv(stopWordListPath)['stop_word']))

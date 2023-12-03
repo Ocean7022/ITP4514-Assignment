@@ -53,21 +53,21 @@ class GRU_ModelTuning:
                 print('Invalid input, please try again.')
                 self.__init__()
 
-        self.train_dataset, self.test_dataset = self.dataPorcess()
+        self.train_dataset, self.test_dataset = self.__dataPorcess()
         self.train_loader = DataLoader(self.train_dataset, batch_size=config.batch_size, shuffle=True)
         self.test_loader = DataLoader(self.test_dataset, batch_size=config.batch_size, shuffle=False)
 
-        self.device = self.getDevice()
+        self.device = self.__getDevice()
         self.model = GRUModel(config.input_size, config.hidden_size, config.num_layers, config.num_classes).to(self.device)
-        self.class_weights = self.countClassWeights(self.train_dataset).to(self.device)
+        self.class_weights = self.__countClassWeights(self.train_dataset).to(self.device)
         self.criterion = nn.CrossEntropyLoss(weight=self.class_weights).to(self.device)
         #criterion = nn.CrossEntropyLoss().to(device)
         self.optimizer = optim.Adam(self.model.parameters(), lr=config.learning_rate)
         self.embedding = nn.Embedding(config.vocab_size, config.embedding_dim).to(self.device)
-        self.startTraining()
-        self.startTesting()
+        self.__startTraining()
+        self.__startTesting()
     
-    def startTraining(self):
+    def __startTraining(self):
         best_val_loss = float('inf')
         patience = 5
         patience_counter = 0
@@ -120,7 +120,7 @@ class GRU_ModelTuning:
                     break
         print('Finished Training')
 
-    def startTesting(self):
+    def __startTesting(self):
         print('Start testing...')
         with torch.no_grad():
             correct = 0
@@ -139,7 +139,7 @@ class GRU_ModelTuning:
             print('Test Accuracy: {} %'.format(100 * correct / total))
         print('Finished Testing\n')
 
-    def dataPorcess(self):
+    def __dataPorcess(self):
         if os.path.exists(config.GRUDataSetPath):
             print('Processed DataSet already exists.')
             return self.getTrainAndTestLoder(torch.load(config.GRUDataSetPath))
@@ -154,7 +154,7 @@ class GRU_ModelTuning:
 
             texts = [item['title'] + '. ' + item['content'] for item in data]
             labels = [item['category'] for item in data]
-            texts, labels = self.cleanToShortData(texts, labels)
+            texts, labels = self.__cleanToShortData(texts, labels)
             label_encoder = LabelEncoder()
             labels = label_encoder.fit_transform(labels)
 
@@ -171,7 +171,7 @@ class GRU_ModelTuning:
             stemmer = PorterStemmer()
             texts = [[stemmer.stem(word) for word in text] for text in tqdm(texts, desc='Stemming', ncols=100)]
                 
-            #countAvgLength(texts)
+            #self.__countAvgLength(texts)
 
             word_freq = Counter(word for sentence in tqdm(texts, desc='Processing Texts', ncols=100) for word in sentence)
             # customizing the vocabulary size
@@ -183,6 +183,7 @@ class GRU_ModelTuning:
             print('Vocabulary Size:', len(vocab))
 
             word_to_index = {word: index for index, word in enumerate(vocab)}
+            torch.save(word_to_index, config.GRUWordToIndexPath)
             texts = [[word_to_index.get(word, word_to_index["UNK"]) for word in text] for text in tqdm(texts, desc='Converting to Sequences', ncols=100)]
 
             padded_sequences = pad_sequence([torch.tensor(seq[:config.max_length]) for seq in tqdm(texts, desc='Padding Sequences', ncols=100)], batch_first=True)
@@ -191,7 +192,7 @@ class GRU_ModelTuning:
             torch.save(dataset, config.GRUDataSetPath)
             return self.getTrainAndTestLoder(dataset)
 
-    def cleanToShortData(self, texts, labels, minSentenceLength = 10):
+    def __cleanToShortData(self, texts, labels, minSentenceLength = 10):
         newTexts = []
         newLabels = []
         for label, text in tqdm(zip(labels, texts), desc='Removing too short data', ncols=100):
@@ -209,9 +210,9 @@ class GRU_ModelTuning:
         test_size = total_size - train_size
 
         train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
-        return self.dataSetSort(train_dataset), test_dataset
+        return self.__dataSetSort(train_dataset), test_dataset
 
-    def getDevice(self):
+    def __getDevice(self):
         if torch.cuda.is_available():
             print(f'Using GPU: {torch.cuda.get_device_name(torch.cuda.current_device())}')
             return torch.device('cuda')
@@ -219,7 +220,7 @@ class GRU_ModelTuning:
             print('Using CPU')
             return torch.device('cpu')
 
-    def countAvgLength(texts):
+    def __countAvgLength(texts):
         text_lengths = [len(text) for text in texts]
         sortedText = sorted(text_lengths)
         #print('Total Texts:', sortedText)
@@ -239,7 +240,7 @@ class GRU_ModelTuning:
         plt.ylabel('Frequency')
         plt.savefig('../img/GUR-Tuning/textsLengthDistribution.png')
 
-    def dataSetSort(self, dataSet):
+    def __dataSetSort(self, dataSet):
         texts = [dataSet[i][0] for i in range(len(dataSet))]
         labels = [dataSet[i][1] for i in range(len(dataSet))]
 
@@ -249,7 +250,7 @@ class GRU_ModelTuning:
 
         return NewsDataset(list(sorted_texts), list(sorted_labels))
 
-    def countClassWeights(self, dataset):
+    def __countClassWeights(self, dataset):
         labels = [dataset[i][1].item() for i in range(len(dataset))]
         label_counts = Counter(labels)
         num_samples_class = [label_counts[i] for i in range(config.num_classes)]

@@ -62,7 +62,8 @@ class Start:
         print('\n[b] - Back')
         option = input('Select an option: ')
         if option == '1':
-            pass
+            import GRU_Classification as GRU
+            GRU.GRU_Classification(self.__readTestData())
         elif option == '2':
             import GRU_ModelTuning as GRU
             GRU.GRU_ModelTuning()
