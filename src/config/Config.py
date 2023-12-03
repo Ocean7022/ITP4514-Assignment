@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
 
 stopWordListPath = '../data/stopWordList.csv'
+testDataFolderPath = '../data/testData'
 
 # NB model
 dataSetPath = '../data/newsDataSet.json'

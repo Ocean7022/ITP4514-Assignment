@@ -1,4 +1,6 @@
 import time
+import config.Config as config
+import os
 
 class Start:
     def __init__(self):
@@ -38,6 +40,7 @@ class Start:
         option = input('Select an option: ')
         if option == '1':
             import NB_Classification as NB
+            NB.NB_Classification(self.__readTestData())
         elif option == '2':
             import NB_ModelEvaluation as NB
             NB.NB_ModelEvaluation()
@@ -58,6 +61,39 @@ class Start:
 
     def __t5(self):
         pass
+
+    def __readTestData(self):
+        print('\nPlease put the test data in the [data/testData] folder.')
+        input('Press enter to continue...')
+        file_list = os.listdir(config.testDataFolderPath)
+        files = []
+        for file_name in file_list:
+            file_path = os.path.join(config.testDataFolderPath, file_name)
+            if file_path.endswith('.txt'):
+                with open(file_path, 'r') as f:
+                    files.append(
+                        {
+                            'file_name': file_name,
+                            'file_content': self.__cleaneTestData(f.read())
+                        }
+                    )
+        
+        print('\nYou have', len(files), 'test data.')
+        for index, file in enumerate(files):
+            print(f'  [{index + 1}] -', file['file_name'])
+
+        while True:
+            index = input('Please select a test data: ')
+            if index.isdigit() and int(index) <= len(files) and int(index) > 0:
+                return files[int(index) - 1]
+            else:
+                print('Invalid input, please try again.\n')
+
+    def __cleaneTestData(self, input_string):
+        special_chars = ['\u2013', '\u2014', '\u00ad', '\u2018', '\u2019', '\u201c', '\u201d', '\u00AD', '\n', '\t', '\r', '\f']
+        for char in special_chars:
+            input_string = input_string.replace(char, "")
+        return input_string
 
 
 if __name__ == '__main__':

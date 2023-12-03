@@ -9,10 +9,10 @@ class NB_FeatureAnalysis:
         if self.numOfFeatures.isdigit():
             self.numOfFeatures = int(self.numOfFeatures)
             if self.numOfFeatures < 10 or self.numOfFeatures > 50:
-                print('Invalid input, please try again.\n')
+                print('Invalid input, please try again.')
                 self.__init__()
         else:
-            print('Invalid input, please try again.\n')
+            print('Invalid input, please try again.')
             self.__init__()
 
         self.__analyze()
