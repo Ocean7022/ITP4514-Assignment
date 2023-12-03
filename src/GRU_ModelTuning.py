@@ -44,13 +44,13 @@ class GRUModel(nn.Module):
 class GRU_ModelTuning:
     def __init__(self):
         if os.path.exists(config.GRUDataSetPath):
-            select = input('Do you want to delete old dataSet? (y/n): ')
+            select = input('\nDo you want to delete old dataSet? (y/n): ')
             if select == 'y':
                 os.remove(config.GRUDataSetPath)
             elif select == 'n':
                 pass
             else:
-                print('Invalid input, please try again.\n')
+                print('Invalid input, please try again.')
                 self.__init__()
 
         self.train_dataset, self.test_dataset = self.dataPorcess()
@@ -141,10 +141,10 @@ class GRU_ModelTuning:
 
     def dataPorcess(self):
         if os.path.exists(config.GRUDataSetPath):
-            print('\nProcessed DataSet already exists.')
+            print('Processed DataSet already exists.')
             return self.getTrainAndTestLoder(torch.load(config.GRUDataSetPath))
         else:
-            print('\nProcessed DataSet does not exist, start processing...')
+            print('Processed DataSet does not exist, start processing...')
             print('Reading DataSet...')
             with open(config.dataSetPath, 'r', encoding='utf-8') as file:
                 data = json.load(file)
