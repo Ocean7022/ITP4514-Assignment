@@ -43,6 +43,7 @@ class GRUModel(nn.Module):
 
 class GRU_ModelTuning:
     def __init__(self):
+        self.classes = []
         if os.path.exists(config.GRUProcessedDataSetPath):
             select = input('\nDo you want to delete old dataSet? (y/n): ')
             if select == 'y':
@@ -54,24 +55,14 @@ class GRU_ModelTuning:
                 self.__init__()
 
         self.train_dataset, self.test_dataset = self.__dataPorcess()
-        texts = [self.train_dataset[i][0] for i in range(len(self.train_dataset))]
-        labels = [self.train_dataset[i][1] for i in range(len(self.train_dataset))]
-        print(labels[:10])
-
-        label_encoder = LabelEncoder()
-        labels = label_encoder.fit_transform(labels)
-        print(label_encoder.classes_)
-
-        self.train_dataset = NewsDataset(texts, torch.tensor(labels))
-        
+        self.train_dataset, self.test_dataset = self.__saveClasses(self.train_dataset, self.test_dataset)
 
         self.train_loader = DataLoader(self.train_dataset, batch_size=config.batch_size, shuffle=True)
         self.test_loader = DataLoader(self.test_dataset, batch_size=config.batch_size, shuffle=False)
 
         self.device = self.__getDevice()
         self.model = GRUModel(config.input_size, config.hidden_size, config.num_layers, config.num_classes).to(self.device)
-        self.class_weights = self.__countClassWeights(self.train_dataset).to(self.device)
-        exit()
+        self.class_weights = self.__countClassWeights(self.train_dataset).to(self.device)    
         self.criterion = nn.CrossEntropyLoss(weight=self.class_weights).to(self.device)
         #criterion = nn.CrossEntropyLoss().to(device)
         self.optimizer = optim.Adam(self.model.parameters(), lr=config.learning_rate)
@@ -209,7 +200,7 @@ class GRU_ModelTuning:
             torch.save(dataset, config.GRUProcessedDataSetPath)
             return self.__getTrainAndTestLoder(dataset)
 
-    def __cleanToShortData(self, texts, labels, minSentenceLength = 50):
+    def __cleanToShortData(self, texts, labels, minSentenceLength = 10):
         newTexts = []
         newLabels = []
         for label, text in tqdm(zip(labels, texts), desc='Removing too short data', ncols=100):
@@ -257,19 +248,18 @@ class GRU_ModelTuning:
         plt.ylabel('Frequency')
         plt.savefig('../img/GUR-Tuning/textsLengthDistribution.png')
 
-    def __dataSetSort(self, dataSet):
-        texts = [dataSet[i][0] for i in range(len(dataSet))]
-        labels = [dataSet[i][1] for i in range(len(dataSet))]
-
-        combined = list(zip(texts, labels))
-        sorted_combined = sorted(combined, key=lambda x: x[1])
-        sorted_texts, sorted_labels = zip(*sorted_combined)
-
-        label_encoder = LabelEncoder()
-        sorted_labels = label_encoder.fit_transform(sorted_labels)
-        print(label_encoder.classes_)
-        exit()
-        return NewsDataset(list(sorted_texts), list(sorted_labels))
+    def __saveClasses(self, train_dataset, test_dataset):
+        train_texts = [train_dataset[i][0] for i in range(len(train_dataset))]
+        test_texts = [test_dataset[i][0] for i in range(len(test_dataset))]
+        train_labels = [train_dataset[i][1] for i in range(len(train_dataset))]
+        test_labels = [test_dataset[i][1] for i in range(len(test_dataset))]
+        train_label_encoder = LabelEncoder()
+        test_label_encoder = LabelEncoder()
+        train_labels = train_label_encoder.fit_transform(train_labels)
+        test_labels = test_label_encoder.fit_transform(test_labels)
+        self.classes = train_label_encoder.classes_
+        torch.save(self.classes, config.GRUClassesPath)
+        return NewsDataset(train_texts, torch.tensor(train_labels)), NewsDataset(test_texts, torch.tensor(test_labels))
 
     def __countClassWeights(self, dataset):
         labels = [dataset[i][1].item() for i in range(len(dataset))]
@@ -278,5 +268,6 @@ class GRU_ModelTuning:
         weights = [1 - (x / sum(num_samples_class)) for x in num_samples_class]
         total_weight = sum(weights)
         normalized_weights = [w / total_weight for w in weights]
-        print('Weights:', normalized_weights)
+        for i in range(config.num_classes):
+            print(f'{self.classes[i]}: {normalized_weights[i]:.4f}')
         return torch.tensor(normalized_weights, dtype=torch.float)

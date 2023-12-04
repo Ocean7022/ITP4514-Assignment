@@ -24,7 +24,7 @@ class GRU_Classification:
     def __init__(self, testData):
         self.testData = testData['file_content']
         self.device = self.__getDevice()
-        label_encoder = torch.load(config.GRULabelEncoderPath)
+        label_encoder = torch.load(config.GRUClassesPath)
         self.class_names = label_encoder.classes_
         self.model = GRUModel(config.input_size, config.hidden_size, config.num_layers, config.num_classes).to(self.device)
         self.embedding = nn.Embedding(config.vocab_size, config.embedding_dim).to(self.device)
