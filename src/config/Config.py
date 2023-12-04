@@ -27,7 +27,7 @@ GRUClassificationModelPath = './model/GRU/GRU-ClassificationModel.pth'
 GRUStareDictPath = './model/GRU/GRU-StareDict.pth'
 GRUClassesPath = './model/GRU/GRU-Classes.pth'
 
-stopWordList = ENGLISH_STOP_WORDS.union(set(pd.read_csv(stopWordListPath)['stop_word']))
+stopWordList = ENGLISH_STOP_WORDS
 pattern = r'\b[a-zA-Z]{3,}\b'
 
 batch_size = 128

@@ -14,6 +14,7 @@ from tqdm import tqdm
 from collections import Counter
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem import PorterStemmer
+import torch.nn.functional as F
 
 class NewsDataset(Dataset):
     def __init__(self, texts, labels):
@@ -136,9 +137,13 @@ class GRU_ModelTuning:
                 embedded_texts = self.embedding(texts)
                 
                 outputs = self.model(embedded_texts)
+                probabilities = F.softmax(outputs, dim=1)
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
+
+                for i, class_name in enumerate(self.classes):
+                    print(f"{class_name}: {probabilities[0][i].item():.4f}")
 
             print('Test Accuracy: {} %'.format(100 * correct / total))
         print('Finished Testing\n')
@@ -173,10 +178,13 @@ class GRU_ModelTuning:
             pattern = re.compile(config.pattern)
             texts = [[word for word in text if pattern.match(word)] for text in tqdm(texts, desc='Removing Non-English Words', ncols=100)]
 
-            texts = [[word for word in text if word not in config.stopWordList] for text in tqdm(texts, desc='Removing Stopwords', ncols=100)]
-
             stemmer = PorterStemmer()
             texts = [[stemmer.stem(word) for word in text] for text in tqdm(texts, desc='Stemming', ncols=100)]
+
+            texts = [[word for word in text if word not in config.stopWordList] for text in tqdm(texts, desc='Removing Stopwords', ncols=100)]
+
+
+
                 
             #self.__countAvgLength(texts)
 
@@ -268,6 +276,7 @@ class GRU_ModelTuning:
         weights = [1 - (x / sum(num_samples_class)) for x in num_samples_class]
         total_weight = sum(weights)
         normalized_weights = [w / total_weight for w in weights]
-        for i in range(config.num_classes):
-            print(f'{self.classes[i]}: {normalized_weights[i]:.4f}')
+        print('Weights:', normalized_weights)
+        #for i in range(config.num_classes):
+        #    print(f'{self.classes[i]}: {normalized_weights[i]:.4f}')
         return torch.tensor(normalized_weights, dtype=torch.float)

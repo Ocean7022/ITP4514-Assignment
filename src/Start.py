@@ -87,7 +87,7 @@ class Start:
         for file_name in file_list:
             file_path = os.path.join(config.testDataFolderPath, file_name)
             if file_path.endswith('.txt'):
-                with open(file_path, 'r') as f:
+                with open(file_path, 'r', encoding='utf-8') as f:
                     files.append(
                         {
                             'file_name': file_name,
