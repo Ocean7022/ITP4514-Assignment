@@ -8,7 +8,6 @@ import nltk, string, os, re
 import matplotlib.pyplot as plt
 import seaborn as sns
 from torch.utils.data import Dataset, DataLoader, random_split
-from torch.nn.utils.rnn import pad_sequence
 from sklearn.preprocessing import LabelEncoder
 from tqdm import tqdm
 from collections import Counter
@@ -135,6 +134,7 @@ class GRU_ModelTuning:
                 labels = labels.to(self.device)
                 
                 embedded_texts = self.embedding(texts)
+                print(embedded_texts.shape)
                 
                 outputs = self.model(embedded_texts)
                 probabilities = F.softmax(outputs, dim=1)
@@ -168,24 +168,16 @@ class GRU_ModelTuning:
            # label_encoder = LabelEncoder()
            # labels = label_encoder.fit_transform(labels)
            # print(torch.tensor(labels))
-           # exit()
 
             translator = str.maketrans('', '', string.punctuation)
             texts = [text.translate(translator) for text in tqdm(texts, desc='Removing Punctuations', ncols=100)]
-
             texts = [word_tokenize(text.lower()) for text in tqdm(texts, desc='Tokenizing', ncols=100)]
-
             pattern = re.compile(config.pattern)
             texts = [[word for word in text if pattern.match(word)] for text in tqdm(texts, desc='Removing Non-English Words', ncols=100)]
-
             stemmer = PorterStemmer()
             texts = [[stemmer.stem(word) for word in text] for text in tqdm(texts, desc='Stemming', ncols=100)]
-
             texts = [[word for word in text if word not in config.stopWordList] for text in tqdm(texts, desc='Removing Stopwords', ncols=100)]
 
-
-
-                
             #self.__countAvgLength(texts)
 
             word_freq = Counter(word for sentence in tqdm(texts, desc='Processing Texts', ncols=100) for word in sentence)
@@ -193,16 +185,27 @@ class GRU_ModelTuning:
             vocab = [word for word, freq in tqdm(word_freq.most_common(config.vocab_size - 2), desc='Creating Vocabulary', ncols=100)]
             # full size vocabulary
             #vocab = [word for word, freq in tqdm(word_freq.most_common(len(word_freq) - 2), desc='Creating Vocabulary', ncols=100)]
+            #config.vocab_size = len(vocab)
             vocab.append("UNK")
             vocab.append("PAD")
-            config.vocab_size = len(vocab)
             print('Vocabulary Size:', len(vocab))
 
             word_to_index = {word: index for index, word in enumerate(vocab)}
             torch.save(word_to_index, config.GRUWordToIndexPath)
             texts = [[word_to_index.get(word, word_to_index["UNK"]) for word in text] for text in tqdm(texts, desc='Converting to Sequences', ncols=100)]
+            #print(texts[3])
+            #exit()
 
-            padded_sequences = pad_sequence([torch.tensor(seq[:config.max_length]) for seq in tqdm(texts, desc='Padding Sequences', ncols=100)], batch_first=True)
+            padded_sequences = []
+            for seq in tqdm(texts, desc='Padding Sequences', ncols=100):
+                if len(seq) < config.max_length:
+                    seq += [word_to_index["PAD"]] * (config.max_length - len(seq))
+                else:
+                    seq = seq[:config.max_length]
+                padded_sequences.append(torch.tensor(seq, dtype=torch.long))
+
+            padded_sequences = torch.stack(padded_sequences, dim=0)
+
             
             dataset = NewsDataset(padded_sequences, labels)
             torch.save(dataset, config.GRUProcessedDataSetPath)

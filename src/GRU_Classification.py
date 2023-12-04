@@ -38,14 +38,10 @@ class GRU_Classification:
         self.classify()
 
     def classify(self):
-        # Process text data
         processed_text = self.__process_text(self.text)
 
-        # Embedding
-        embedded_text = self.embedding(processed_text).unsqueeze(0)
-
-        if len(embedded_text.shape) == 4:
-            embedded_text = embedded_text.squeeze(0)
+        embedded_text = self.embedding(processed_text)
+        print(embedded_text.shape)
 
         # Prediction
         self.model.eval()
@@ -69,19 +65,20 @@ class GRU_Classification:
         text = word_tokenize(text.lower())
         pattern = re.compile(config.pattern)
         text = [word for word in text if pattern.match(word)]
-        text = [word for word in text if word not in config.stopWordList]
         stemmer = PorterStemmer()
         text = [stemmer.stem(word) for word in text]
-        print(text)
-        print(len(text))
-
+        text = [word for word in text if word not in config.stopWordList]
         
         text = [self.word_to_index.get(word, self.word_to_index["UNK"]) for word in text]
+        #print(text)
         if len(text) < config.max_length:
             text += [self.word_to_index["PAD"]] * (config.max_length - len(text))
         else:
             text = text[:config.max_length]
         text_tensor = torch.tensor([text], dtype=torch.long)
+        #print(text_tensor)
+        #print(len(text))
+        #exit()
         return text_tensor.to(self.device)
 
     def __getDevice(self):
