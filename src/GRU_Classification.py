@@ -39,7 +39,7 @@ class GRU_Classification:
 
     def classify(self):
         processed_text = self.__process_text(self.text)
-
+        print(processed_text)
         embedded_text = self.embedding(processed_text)
         print(embedded_text.shape)
 

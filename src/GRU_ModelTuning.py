@@ -85,8 +85,11 @@ class GRU_ModelTuning:
                 labels = labels.to(self.device)
 
                 embedded_texts = self.embedding(texts)
-
+                #embedded_texts = [torch.mean(embedded_text, dim=0) for embedded_text in embedded_texts]
+                #embedded_texts = [embedded_text.unsqueeze(1) for embedded_text in embedded_texts]
+                
                 outputs = self.model(embedded_texts)
+                #outputs = self.model(torch.stack(embedded_texts))
                 loss = self.criterion(outputs, labels.long())
                 self.optimizer.zero_grad()
                 loss.backward()
@@ -100,8 +103,11 @@ class GRU_ModelTuning:
                     labels = labels.to(self.device)
 
                     embedded_texts = self.embedding(texts)
+                    #embedded_texts = [torch.mean(embedded_text, dim=0) for embedded_text in embedded_texts]
+                    #embedded_texts = [embedded_text.unsqueeze(1) for embedded_text in embedded_texts]
+                    
                     outputs = self.model(embedded_texts)
-
+                    #outputs = self.model(torch.stack(embedded_texts))
                     loss = self.criterion(outputs, labels.long())
                     val_loss += loss.item()
 
@@ -129,24 +135,48 @@ class GRU_ModelTuning:
         with torch.no_grad():
             correct = 0
             total = 0
+            index = 0
             for texts, labels in self.test_loader:
                 texts = texts.to(self.device)
                 labels = labels.to(self.device)
                 
                 embedded_texts = self.embedding(texts)
-                print(embedded_texts.shape)
+                #embedded_texts = [torch.mean(embedded_text, dim=0) for embedded_text in embedded_texts]
+                #embedded_texts = [embedded_text.unsqueeze(1) for embedded_text in embedded_texts]
                 
                 outputs = self.model(embedded_texts)
+                #outputs = self.model(torch.stack(embedded_texts))
                 probabilities = F.softmax(outputs, dim=1)
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
-                for i, class_name in enumerate(self.classes):
-                    print(f"{class_name}: {probabilities[0][i].item():.4f}")
+                for idx in range(predicted.size(0)):
+                    print('\nResult for Test Sample #{}:'.format(idx))
+                    print('Predicted Label:', self.classes[predicted[idx].item()])
+                    print('Actual Label:', self.classes[labels[idx].item()])
+                    print('Probabilities:')
+                    for i, class_name in enumerate(self.classes):
+                        print(f"  {class_name}: {probabilities[idx][i].item():.4f}")
 
             print('Test Accuracy: {} %'.format(100 * correct / total))
         print('Finished Testing\n')
+
+    def __take500ItemsInEachType(self, texts, labels):
+        new_texts = []
+        new_labels = []
+        label_counts = Counter(labels)
+        for label in label_counts.keys():
+            count = 0
+            for i in range(len(labels)):
+                if labels[i] == label:
+                    new_texts.append(texts[i])
+                    new_labels.append(labels[i])
+                    count += 1
+                    if count == 500:
+                        break
+        print('New DataSet Size:', len(texts))
+        return new_texts, new_labels
 
     def __dataPorcess(self):
         if os.path.exists(config.GRUProcessedDataSetPath):
@@ -164,7 +194,7 @@ class GRU_ModelTuning:
             texts = [item['title'] + '. ' + item['content'] for item in data]
             labels = [item['category'] for item in data]
             texts, labels = self.__cleanToShortData(texts, labels)
-
+            #texts, labels = self.__take500ItemsInEachType(texts, labels)
            # label_encoder = LabelEncoder()
            # labels = label_encoder.fit_transform(labels)
            # print(torch.tensor(labels))
