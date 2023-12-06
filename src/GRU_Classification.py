@@ -6,6 +6,7 @@ from nltk.tokenize import word_tokenize
 from torch.nn.utils.rnn import pad_sequence
 from nltk.stem import PorterStemmer
 import torch.nn.functional as F
+from GRU_DataPorcess import GRU_DataProcess as DP
 
 class GRUModel(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, num_classes):
@@ -24,62 +25,38 @@ class GRUModel(nn.Module):
 
 class GRU_Classification:
     def __init__(self, text):
-        self.text = text['file_content']
-        self.device = self.__getDevice()
-        self.classes = torch.load(config.GRUClassesPath)
-        print(self.classes)
-        for i in range(len(self.classes)):
-            self.classes[i] = self.classes[i].replace('_', ' ')
-        print(self.classes)
-        self.model = GRUModel(config.input_size, config.hidden_size, config.num_layers, config.num_classes).to(self.device)
-        self.model.load_state_dict(torch.load(config.GRUStareDictPath, map_location=self.device))
-        self.embedding = nn.Embedding(config.vocab_size, config.embedding_dim).to(self.device)
-        self.word_to_index = torch.load(config.GRUWordToIndexPath)
-        self.classify()
-
-    def classify(self):
-        processed_text = self.__process_text(self.text)
-        print(processed_text)
-        embedded_text = self.embedding(processed_text)
-        print(embedded_text.shape)
-
-        # Prediction
-        self.model.eval()
-        with torch.no_grad():
-            output = self.model(embedded_text)
-            probabilities = F.softmax(output, dim=1)
-            _, predicted = torch.max(output.data, 1)
-            predicted_class_index = predicted.item()
-            predicted_class_name = self.classes[predicted_class_index]
-
-        # Print results
-        print('Result:', predicted_class_index, predicted_class_name)
-
-        # Print probabilities for each class
-        for i, class_name in enumerate(self.classes):
-            print(f"{class_name}: {probabilities[0][i].item():.4f}")
-
-    def __process_text(self, text):
-        translator = str.maketrans('', '', string.punctuation)
-        text = text.translate(translator)
-        text = word_tokenize(text.lower())
-        pattern = re.compile(config.pattern)
-        text = [word for word in text if pattern.match(word)]
-        stemmer = PorterStemmer()
-        text = [stemmer.stem(word) for word in text]
-        text = [word for word in text if word not in config.stopWordList]
-        
-        text = [self.word_to_index.get(word, self.word_to_index["UNK"]) for word in text]
-        #print(text)
-        if len(text) < config.max_length:
-            text += [self.word_to_index["PAD"]] * (config.max_length - len(text))
-        else:
-            text = text[:config.max_length]
-        text_tensor = torch.tensor([text], dtype=torch.long)
-        #print(text_tensor)
-        #print(len(text))
-        #exit()
-        return text_tensor.to(self.device)
+        text = text['file_content']
+        device = self.__getDevice()
+        self.classify(device, text)
 
     def __getDevice(self):
-        return torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        if torch.cuda.is_available():
+            print(f'Using GPU: {torch.cuda.get_device_name(torch.cuda.current_device())}')
+            return torch.device('cuda')
+        else:
+            print('Using CPU')
+            return torch.device('cpu')
+
+    def classify(self, device, text):
+        model = GRUModel(config.input_size, config.hidden_size, config.num_layers, config.num_classes).to(device)
+        model.load_state_dict(torch.load(config.GRUClassificationModelPath))
+        model.eval()
+
+        word_to_index = torch.load(config.GRUWordToIndexPath)
+        classes = torch.load(config.GRUClassesPath)
+        label_encoder = torch.load(config.GRULabelEncoderPath)
+        embedding = nn.Embedding(config.vocab_size, config.embedding_dim).to(device)
+
+        porcessed_text = DP.process_text(text)
+        indexed_text = [word_to_index.get(word, word_to_index["UNK"]) for word in porcessed_text][:config.max_length]
+        indexed_tensor = torch.tensor([indexed_text], dtype=torch.long)
+        padded_texts = pad_sequence(indexed_tensor, batch_first=True, padding_value=word_to_index["PAD"]).to(device)
+
+        output = model(embedding(padded_texts))
+        _, predicted = torch.max(output, dim=1)
+
+        # Print results
+        print(label_encoder.inverse_transform([predicted.item()])[0])
+
+
+
