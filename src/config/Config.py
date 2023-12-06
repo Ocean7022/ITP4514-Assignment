@@ -22,9 +22,9 @@ tfidf = TfidfVectorizer(
 
 # GUR model
 GRUProcessedDataSetPath = './model/GRU/GRU-ProcessedDataSet.pth'
-GRUWordToIndexPath = './model/GRU/GRU-WordToIndex.pth'
 GRUClassificationModelPath = './model/GRU/GRU-ClassificationModel.pth'
-GRUStareDictPath = './model/GRU/GRU-StareDict.pth'
+GRULabelEncoderPath = './model/GRU/GRU-LabelEncoder.pth'
+GRUWordToIndexPath = './model/GRU/GRU-WordToIndex.pth'
 GRUClassesPath = './model/GRU/GRU-Classes.pth'
 
 stopWordList = ENGLISH_STOP_WORDS
@@ -35,7 +35,7 @@ train_ratio = 0.8
 
 # Data preprocessing parameters
 max_length = 1000
-vocab_size = 14000
+vocab_size = 19000
 embedding_dim = 400
 input_size = embedding_dim
 
@@ -44,5 +44,5 @@ hidden_size = 128
 num_layers = 3
 num_classes = 9 # num of types of news
 learning_rate = 0.003
-num_epochs = 20
+num_epochs = 30
 
