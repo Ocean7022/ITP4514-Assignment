@@ -25,7 +25,7 @@ GRUProcessedDataSetPath = './model/GRU/GRU-ProcessedDataSet.pth'
 GRUClassificationModelPath = './model/GRU/GRU-ClassificationModel.pth'
 GRULabelEncoderPath = './model/GRU/GRU-LabelEncoder.pth'
 GRUWordToIndexPath = './model/GRU/GRU-WordToIndex.pth'
-GRUClassesPath = './model/GRU/GRU-Classes.pth'
+GRUClassWeightPath = './model/GRU/GRU-ClassWeight.pth'
 
 stopWordList = ENGLISH_STOP_WORDS
 pattern = r'\b[a-zA-Z]{3,}\b'
@@ -35,7 +35,7 @@ train_ratio = 0.8
 
 # Data preprocessing parameters
 max_length = 1000
-vocab_size = 19000
+vocab_size = 90000
 embedding_dim = 400
 input_size = embedding_dim
 
@@ -43,6 +43,6 @@ input_size = embedding_dim
 hidden_size = 128
 num_layers = 3
 num_classes = 9 # num of types of news
-learning_rate = 0.003
-num_epochs = 30
+learning_rate = 0.001
+num_epochs = 40
 

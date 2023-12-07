@@ -43,7 +43,7 @@ class GRU_Classification:
         model.eval()
 
         word_to_index = torch.load(config.GRUWordToIndexPath)
-        classes = torch.load(config.GRUClassesPath)
+        class_weight = torch.load(config.GRUClassWeightPath)
         label_encoder = torch.load(config.GRULabelEncoderPath)
         embedding = nn.Embedding(config.vocab_size, config.embedding_dim).to(device)
 
@@ -53,10 +53,13 @@ class GRU_Classification:
         padded_texts = pad_sequence(indexed_tensor, batch_first=True, padding_value=word_to_index["PAD"]).to(device)
 
         output = model(embedding(padded_texts))
-        _, predicted = torch.max(output, dim=1)
-
-        # Print results
-        print(label_encoder.inverse_transform([predicted.item()])[0])
+        probabilities = torch.nn.functional.softmax(output, dim=1)
+        _, predicted = torch.max(probabilities, dim=1)
+        predicted_class = label_encoder.inverse_transform([predicted.item()])[0]
+        print(f" - Predicted class: [ {predicted_class} ]")
+        for idx, prob in enumerate(probabilities[0]):
+            class_name = label_encoder.inverse_transform([idx])[0]
+            print(f"      {class_name}: {prob.item():.4f}")
 
 
 

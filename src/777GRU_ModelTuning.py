@@ -299,7 +299,7 @@ class GRU_ModelTuning:
         train_labels = train_label_encoder.fit_transform(train_labels)
         test_labels = test_label_encoder.fit_transform(test_labels)
         self.classes = train_label_encoder.classes_
-        torch.save(self.classes, config.GRUClassesPath)
+        torch.save(self.classes, config.GRUClassWeightPath)
         return NewsDataset(train_texts, torch.tensor(train_labels)), NewsDataset(test_texts, torch.tensor(test_labels))
 
     def __countClassWeights(self, dataset):
