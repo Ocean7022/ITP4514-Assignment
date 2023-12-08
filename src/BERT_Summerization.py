@@ -22,35 +22,35 @@ class BERT_Summerization:
             return torch.device('cpu')
 
     def __summerization(self, sentences, tokenizer, model):
-        # 對每個句子進行BERT分詞，並創建attention mask
+        # Tokenize each sentence using BERT and create attention masks
         encoding = tokenizer(sentences, padding=True, truncation=True, return_tensors='pt', add_special_tokens=True)
         input_ids = encoding['input_ids']
         attention_mask = encoding['attention_mask']
 
-        # 禁用梯度計算，進行模型的前向傳播，獲取輸出
+        # Disable gradient computation, perform forward pass, and get outputs
         with torch.no_grad():
             outputs = model(input_ids, attention_mask=attention_mask)
-            # 取每個句子的[CLS]標記的輸出作為句子的嵌入表示
+            # Use the output of the [CLS] token of each sentence as the sentence embedding
             sentence_embeddings = outputs.last_hidden_state[:,0,:].cpu().numpy()
 
-        # 使用KMeans進行聚類分析，設置要形成的聚類數量
+        # Use KMeans for clustering analysis, set the number of clusters to be formed
         kmeans = KMeans(n_clusters=3, n_init=10)
-        # 對句子嵌入進行聚類
+        # Perform clustering on sentence embeddings
         kmeans.fit(sentence_embeddings)
 
-        # 對每個聚類中心，找到最接近的句子
+        # For each cluster center, find the closest sentence
         closest_sentences_indices = []
         for cluster_center in kmeans.cluster_centers_:
-            # 計算每個句子與聚類中心的距離
+            # Calculate the distance of each sentence to the cluster center
             distances = torch.norm(torch.tensor(sentence_embeddings) - torch.tensor(cluster_center), dim=1)
-            # 找到距離最近的句子的索引
+            # Find the index of the closest sentence
             closest_sentence_index = distances.argmin().item()
             closest_sentences_indices.append(closest_sentence_index)
 
-        # 確保選擇的句子是唯一的
+        # Ensure the selected sentences are unique
         unique_sentence_indices = list(set(closest_sentences_indices))
 
-        # 如果選擇的句子數量少於3個，則選擇剩餘最接近的句子
+        # If the number of selected sentences is less than 3, choose additional closest sentences
         while len(unique_sentence_indices) < 3 and len(unique_sentence_indices) < len(sentences):
             for i, cluster_center in enumerate(kmeans.cluster_centers_):
                 if len(unique_sentence_indices) == 3:
@@ -61,9 +61,9 @@ class BERT_Summerization:
                         unique_sentence_indices.append(index.item())
                         break
 
-        # 根據索引提取摘要句子
+        # Extract summary sentences based on indices
         summary_sentences = [sentences[idx] for idx in unique_sentence_indices if idx < len(sentences)]
 
-        # 將摘要句子組合成摘要
+        # Combine summary sentences into a summary
         summary = '. '.join(summary_sentences)
-        print('\nSummart:\n  ', summary + ".")
+        print('\nSummary:\n  ', summary + ".")
