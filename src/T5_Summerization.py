@@ -1,14 +1,12 @@
 from transformers import T5Tokenizer, T5ForConditionalGeneration
-import pandas as pd
 import torch
-import config.Config as config
 
 class T5_Summerization:
     def __init__(self, text):
         device = self.__getDevice()
         model = T5ForConditionalGeneration.from_pretrained('t5-small').to(device)
         tokenizer = T5Tokenizer.from_pretrained('t5-small', legacy=False)
-        summary = self.__summerization(text, model, device, tokenizer)
+        summary = self.generate_summary(text, model, device, tokenizer)
         print('\nSummart:\n  ', summary + ".")
 
     def __getDevice(self):
