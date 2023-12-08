@@ -75,7 +75,8 @@ class Start:
             self.__gru()
 
     def __bert(self):
-        pass
+        import BERT_Summerization as BERT
+        BERT.BERT_Summerization(self.__readTestData())
 
     def __t5(self):
         pass
