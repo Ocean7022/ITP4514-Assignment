@@ -79,7 +79,8 @@ class Start:
         BERT.BERT_Summerization(self.__readTestData())
 
     def __t5(self):
-        pass
+        import T5_Summerization as T5
+        T5.T5_Summerization(self.__readTestData())
 
     def __readTestData(self):
         print('\nPlease put the test data in the [data/testData] folder.')
@@ -113,7 +114,6 @@ class Start:
         for char in special_chars:
             input_string = input_string.replace(char, "")
         return input_string
-
 
 if __name__ == '__main__':
     Start()
