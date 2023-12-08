@@ -43,6 +43,6 @@ input_size = embedding_dim
 hidden_size = 128
 num_layers = 3
 num_classes = 9 # num of types of news
-learning_rate = 0.001
-num_epochs = 40
+learning_rate = 0.003
+num_epochs = 20
 
