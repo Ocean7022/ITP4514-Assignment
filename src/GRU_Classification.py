@@ -4,10 +4,12 @@ import torch
 from torch.nn.utils.rnn import pad_sequence
 from collections import Counter
 from GRU_DataPorcess import GRU_DataProcess as DP
+import nltk
 
 class GRUModel(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, num_classes):
         super(GRUModel, self).__init__()
+        nltk.download('punkt')
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.gru = nn.GRU(input_size, hidden_size, num_layers, batch_first=True)
