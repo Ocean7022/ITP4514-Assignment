@@ -1,9 +1,6 @@
 from transformers import BertTokenizer, BertModel
 import torch
-import pandas as pd
 from sklearn.cluster import KMeans
-import config.Config as config
-
 
 class BERT_Summerization:
     def __init__(self, text):
