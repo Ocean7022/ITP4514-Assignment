@@ -1,11 +1,8 @@
-import string, re
 import torch.nn as nn
 import config.Config as config
 import torch
-from nltk.tokenize import word_tokenize
 from torch.nn.utils.rnn import pad_sequence
-from nltk.stem import PorterStemmer
-import torch.nn.functional as F
+from collections import Counter
 from GRU_DataPorcess import GRU_DataProcess as DP
 
 class GRUModel(nn.Module):
@@ -24,41 +21,42 @@ class GRUModel(nn.Module):
         return out
 
 class GRU_Classification:
-    def __init__(self, text):
-        text = text['file_content']
-        device = self.__getDevice()
-        self.classify(device, text)
+    def __init__(self):
+        self.device = self.__getDevice()
+        self.model = GRUModel(config.input_size, config.hidden_size, config.num_layers, config.num_classes).to(self.device)
+        self.model.load_state_dict(torch.load(config.GRUClassificationModelPath, map_location=self.device))
+        self.model.eval()
+        self.word_to_index = torch.load(config.GRUWordToIndexPath, map_location=self.device)
+        self.label_encoder = torch.load(config.GRULabelEncoderPath, map_location=self.device)
+        self.embedding = nn.Embedding(config.vocab_size, config.embedding_dim).to(self.device)
 
     def __getDevice(self):
         if torch.cuda.is_available():
-            print(f'Using GPU: {torch.cuda.get_device_name(torch.cuda.current_device())}')
+            print(f'\nUsing GPU: {torch.cuda.get_device_name(torch.cuda.current_device())}')
             return torch.device('cuda')
         else:
-            print('Using CPU')
+            print('\nUsing CPU')
             return torch.device('cpu')
 
-    def classify(self, device, text):
-        model = GRUModel(config.input_size, config.hidden_size, config.num_layers, config.num_classes).to(device)
-        model.load_state_dict(torch.load(config.GRUClassificationModelPath))
-        model.eval()
-
-        word_to_index = torch.load(config.GRUWordToIndexPath)
-        class_weight = torch.load(config.GRUClassWeightPath)
-        label_encoder = torch.load(config.GRULabelEncoderPath)
-        embedding = nn.Embedding(config.vocab_size, config.embedding_dim).to(device)
-
-        porcessed_text = DP.process_text(text)
-        indexed_text = [word_to_index.get(word, word_to_index["UNK"]) for word in porcessed_text][:config.max_length]
+    def classify(self, text):
+        processed_text = DP.process_text(text['file_content'])
+        indexed_text = [self.word_to_index.get(word, self.word_to_index["UNK"]) for word in processed_text][:config.max_length]
         indexed_tensor = torch.tensor([indexed_text], dtype=torch.long)
-        padded_texts = pad_sequence(indexed_tensor, batch_first=True, padding_value=word_to_index["PAD"]).to(device)
+        padded_texts = pad_sequence(indexed_tensor, batch_first=True, padding_value=self.word_to_index["PAD"]).to(self.device)
 
-        output = model(embedding(padded_texts))
-        probabilities = torch.nn.functional.softmax(output, dim=1)
-        _, predicted = torch.max(probabilities, dim=1)
-        predicted_class = label_encoder.inverse_transform([predicted.item()])[0]
-        print(f" - Predicted class: [ {predicted_class} ]")
+        result = []
+        for i in range(10):
+            output = self.model(self.embedding(padded_texts))
+            probabilities = torch.nn.functional.softmax(output, dim=1)
+            _, predicted = torch.max(probabilities, dim=1)
+            predicted_class = self.label_encoder.inverse_transform([predicted.item()])[0]
+            result.append(predicted_class)
+
+        count = Counter(result)
+        most_common_result, count = count.most_common(1)[0]
+        print(f"\n - Predicted class: [ {most_common_result} ]")
         for idx, prob in enumerate(probabilities[0]):
-            class_name = label_encoder.inverse_transform([idx])[0]
+            class_name = self.label_encoder.inverse_transform([idx])[0]
             print(f"      {class_name}: {prob.item():.4f}")
 
 

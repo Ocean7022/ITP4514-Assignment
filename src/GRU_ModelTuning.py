@@ -143,9 +143,9 @@ class GRU_ModelTuning:
         optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
         embedding = nn.Embedding(config.vocab_size, config.embedding_dim).to(device)
 
-        patience = 5
+        patience = 10
         best_loss = float('inf')
-        epochs_no_improve = 0
+        patience_counter = 0
         early_stop = False
 
         for epoch in range(config.num_epochs):
@@ -153,7 +153,7 @@ class GRU_ModelTuning:
             total_correct = 0
             total_samples = 0
 
-            # 训练循环
+            # Training Loop
             model.train()
             for i, (texts, labels) in tqdm(enumerate(train_loader), desc=f'Epoch {epoch+1}/{config.num_epochs}', total=len(train_loader), ncols=100):
                 texts = texts.to(device)
@@ -176,7 +176,7 @@ class GRU_ModelTuning:
             accuracy = total_correct / total_samples
             print(f"Epoch {epoch+1}, Average Loss: {avg_loss:.4f}, Accuracy: {accuracy * 100:.4f}%")
 
-            # 验证循环
+            # Testing Loop
             model.eval()
             val_loss = 0.0
             with torch.no_grad():
@@ -191,10 +191,11 @@ class GRU_ModelTuning:
             avg_val_loss = val_loss / len(val_loader)
             if avg_val_loss < best_loss:
                 best_loss = avg_val_loss
-                epochs_no_improve = 0
+                patience_counter = 0
+                trained_model = model # save the model
             else:
-                epochs_no_improve += 1
-                if epochs_no_improve == patience:
+                patience_counter += 1
+                if patience_counter == patience:
                     print("Early stopping!")
                     early_stop = True
                     break
@@ -202,7 +203,7 @@ class GRU_ModelTuning:
         if not early_stop:
             print("Training completed without early stopping.")
 
-        return model
+        return trained_model
 
     def __save(self, model, label_encoder, word_to_index, class_weight):
         torch.save(model.state_dict(), config.GRUClassificationModelPath)

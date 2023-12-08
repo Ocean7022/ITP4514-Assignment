@@ -63,7 +63,8 @@ class Start:
         option = input('Select an option: ')
         if option == '1':
             import GRU_Classification as GRU
-            GRU.GRU_Classification(self.__readTestData())
+            gru = GRU.GRU_Classification()
+            gru.classify(self.__readTestData())
         elif option == '2':
             import GRU_ModelTuning as GRU
             GRU.GRU_ModelTuning()
