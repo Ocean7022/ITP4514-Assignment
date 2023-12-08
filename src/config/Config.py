@@ -1,11 +1,14 @@
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
 
-# DataSet
 dataSetPath = '../data/newsDataSet.json'
-        
-#tfidf
 stopWordListPath = '../data/stopWordList.csv'
+testDataFolderPath = '../data/testData'
+
+# NB model
+vectorizerPath = './model/NB/NB-TfidfVectorizer.joblib'
+nb_classificationModelPath = './model/NB/NB-ClassificationModel.joblib'
+resultPhotoPath = '../img/NB-Tuning/Result.png'
 tfidf = TfidfVectorizer(
     max_features=8000,
     ngram_range=(1, 3),
@@ -16,30 +19,30 @@ tfidf = TfidfVectorizer(
     norm='l2',
     sublinear_tf=True
 )
-#tfidf = TfidfVectorizer()
-vectorizerPath = './model/tfidf_vectorizer.joblib'
-# NB model
-nb_classificationModelPath = './model/NB-ClassificationModel.joblib'
-
-
 
 # GUR model
-GRUDataSetPath = '../data/GRUDataSet.pth'
-GRU_classificationModelPath = './model/GRU-ClassificationModel.pth'
+GRUProcessedDataSetPath = './model/GRU/GRU-ProcessedDataSet.pth'
+GRUClassificationModelPath = './model/GRU/GRU-ClassificationModel.pth'
+GRULabelEncoderPath = './model/GRU/GRU-LabelEncoder.pth'
+GRUWordToIndexPath = './model/GRU/GRU-WordToIndex.pth'
+GRUClassWeightPath = './model/GRU/GRU-ClassWeight.pth'
 
-stopWordList = ENGLISH_STOP_WORDS.union(set(pd.read_csv(stopWordListPath)['stop_word']))
+stopWordList = ENGLISH_STOP_WORDS
 pattern = r'\b[a-zA-Z]{3,}\b'
 
 batch_size = 128
 train_ratio = 0.8
 
+# Data preprocessing parameters
 max_length = 1000
-vocab_size = 14000
+vocab_size = 90000
 embedding_dim = 400
 input_size = embedding_dim
+
+# Training model parameters
 hidden_size = 128
 num_layers = 3
 num_classes = 9 # num of types of news
-learning_rate = 0.003
-num_epochs = 20
+learning_rate = 0.001
+num_epochs = 40
 
