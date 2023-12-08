@@ -110,7 +110,7 @@ class Start:
                 print('Invalid input, please try again.\n')
 
     def __cleaneTestData(self, input_string):
-        special_chars = ['\u2013', '\u2014', '\u00ad', '\u2018', '\u2019', '\u201c', '\u201d', '\u00AD', '\n', '\t', '\r', '\f']
+        special_chars = ['\u2013', '\u2014', '\u00ad', '\u2018', '\u2019', '\u201c', '\u201d', '\u00AD', '\n', '\t', '\r', '\f', '\\', '"']
         for char in special_chars:
             input_string = input_string.replace(char, "")
         return input_string
